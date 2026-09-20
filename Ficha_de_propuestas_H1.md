@@ -80,7 +80,7 @@ aprender aquí.
 | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | **¿Hay código de referencia?**                           | https://github.com/SakanaAI/DiffusionBlocks                                                                                            |
 | **Si no lo hay, ¿el paper da la arquitectura completa?** |                                                          |
-| **Qué NO especifica el paper**                           | _Lo importante. Si la lista está vacía, no habéis leído el paper con suficiente atención: siempre falta algo_ |
+| **Qué NO especifica el paper**                           | No da toda la información necesaria para una reproducción exacta de los experimentos. Cosas que se deberían saber para la implementación similar sería, entre otras cosas, dimensiones exactas de los embeddings, implementación exacta del patch embedding, positional embeddings, cómo se introduce la etiqueta de clase o la estructura exacta de cada DiT block.
 
 ### Comprobación 3 · Cómputo · la regla 5/20
 
@@ -88,28 +88,31 @@ aprender aquí.
 
 |                                                |                                                                                                                   |
 | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **Escala del paper original**                  | _Dataset completo, N épocas, qué hardware, cuánto tardó_                                                          |
-| **Escala que vais a hacer vosotros**           | _Subset de N, M épocas, modelo reducido a…_                                                                       |
-| **Tiempo estimado del entrenamiento completo** | _En minutos, en la máquina que vayáis a usar, y cómo lo habéis medido_                                            |
-| **Qué se pierde al recortar**                  | _La respuesta honesta. «La métrica bajará de 0.72 a algo en torno a 0.6» es una buena respuesta; «nada» no lo es_ |
-| **Hardware que vais a usar**                   | _Portátil / Colab gratuito / otro_                                                                                |
+| **Escala del paper original**                  | DiT-S/2 sobre CIFAR-10, con 100 épocas, batch size 512, AdamW y LR 5e-5. Para el experimento de 3 bloques, el modelo tiene 12 capas y se divide en 3 bloques de 4 capas.                                                          |
+| **Escala que vais a hacer vosotros**           | DiT-S/2 + CIFAR-10, manteniendo la arquitectura y configuración del paper en la medida en que estén especificadas. Como primera fase, se realizará una reproducción reducida de 10–20 épocas para validar que el pipeline funciona.                                                                       |
+| **Tiempo estimado del entrenamiento completo** | Se realizará primero una prueba piloto de 1 época en el hardware definitivo y se medirá el tiempo real por época. Basado en eso se estimará el tiempo total añadiendo un margen del 15–20 % para evaluación.                                         
+| **Qué se pierde al recortar**                  | Puede producir una peor calidad de generación y resultados FID menos estables que los del paper. Por tanto, los resultados obtenidos con este entrenamiento no se interpretarán como una reproducción exacta. |
+| **Hardware que vais a usar**                   | GPU en la nube (Google Colab) u otra GPU disponible en los laboratorios de la universidad. También una GPU disponible.
+|
 
 ### Comprobación 4 · Aplicativo
 
-- [ ] Hay una capa de servicio natural encima de la replicación.
+- [x] Hay una capa de servicio natural encima de la replicación.
 
 |                                |                                                                                   |
 | ------------------------------ | --------------------------------------------------------------------------------- |
-| **Qué construís encima**       | _Un buscador, un detector en vídeo, una API, un panel…_                           |
-| **Quién lo usaría y para qué** | _Una frase. Si no se os ocurre, el proyecto no cumple el objetivo del aplicativo_ |
-| **Qué necesita del modelo**    | _Entrada, salida, latencia aceptable_                                             |
+| **Qué construís encima**       | No tenemos muy claro qué aplicativo crearemos como tal, pero una posibilidad sería una aplicación web/API de generación de imágenes o texto que permita generar contenido utilizando el modelo Diffusion Transformer o Masked Diffusion, por ejemplo. |
+| **Quién lo usaría y para qué** | Un usuario que quiera experimentar y comparar distintos métodos de entrenamiento y fine-tuning. |
+| **Qué necesita del modelo**    | 
+- Entrada: condición de generación y configuración del modelo. 
+- Salida: imagen o texto generado y metadatos de la ejecución.                                          |
 
 ### Riesgo principal
 
 |                                                    |                                                                                              |
 | -------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| **Qué es lo que más probablemente va a salir mal** |                                                                                              |
-| **Qué haríais si pasa**                            | _Útil: «si no converge, reducimos a MNIST y lo declaramos». Inútil: «nada, está controlado»_ |
+| **Qué es lo que más probablemente va a salir mal** |    No conseguir reproducir una generación de imágenes o texto con calidad suficiente o no disponer de recursos computacionales suficientes para entrenar o fine-tunear propiamente la arquitectura escogida.                                                                           |
+| **Qué haríais si pasa**                            | Primero garantizar que el pipeline funciona con un entrenamiento reducido sobre la arquitectura seleccionada; y luego si el entrenamiento completo resulta demasiado costoso, reducir épocas y el número de configuraciones. |
 
 ### Visto bueno del profesor (H2) · no rellenar
 
