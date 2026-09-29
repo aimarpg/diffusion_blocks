@@ -46,7 +46,7 @@ aprender aquí.
 
 ---
 
-## Propuesta 1
+## Propuesta 1 (Diffusion Blocks)
 
 ### Identificación
 
@@ -90,28 +90,28 @@ aprender aquí.
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Escala del paper original**                  | **Reproducción en texto:** Transformer basado en DiT sobre un corpus de texto, siguiendo la configuración del paper para modelos de difusión de texto: 12 capas y 3 DiffusionBlocks. **Experimento autoregresivo:** modelo de aproximadamente 135M de parámetros basado en la arquitectura SmolLM2-135M, entrenado desde cero mediante DiffusionBlocks. El paper evalúa además diferentes configuraciones de bloques y distribuciones de los niveles de ruido/corrupción.                                                                                                       |
 | **Escala que vais a hacer vosotros**           | Se realizarán dos líneas experimentales. **(1) Modelo autoregresivo:** se entrenará desde cero un modelo de aproximadamente **135M de parámetros basado en SmolLM2-135M**, utilizando **TinyStories** en lugar de un corpus de cientos de miles de millones de tokens. Posteriormente, este modelo será utilizado para estudiar el fine-tuning mediante DiffusionBlocks. Como referencia, también se realizará fine-tuning mediante el mismo procedimiento sobre el checkpoint preentrenado oficial de SmolLM2-135M, que no fue preentrenado originalmente con DiffusionBlocks. |
-| **Tiempo estimado del entrenamiento completo** | Antes de ejecutar los experimentos completos se realizará una **prueba piloto** en el hardware definitivo, midiendo tiempo por paso/época, consumo máximo de VRAM y número de tokens procesados por segundo. Estas medidas se utilizarán para estimar el tiempo de cada configuración y seleccionar el número máximo de pasos compatible con el presupuesto computacional. Se reservará además un margen aproximado del **15–20 %** para evaluación, generación de muestras y ablaciones.                                                                                                          |
+| **Tiempo estimado del entrenamiento completo** | Antes de ejecutar los experimentos completos se realizará una **prueba piloto** en el hardware definitivo, midiendo tiempo por paso/época, consumo máximo de VRAM y número de tokens procesados por segundo. Estas medidas se utilizarán para estimar el tiempo de cada configuración y seleccionar el número máximo de pasos compatible con el presupuesto computacional. Se reservará además un margen aproximado del **15–20 %** para evaluación, generación de muestras y ablaciones.                                                                                                 |
 | **Qué se pierde al recortar**                  | El principal efecto del recorte será una menor convergencia y calidad absoluta respecto a modelos entrenados con cantidades de datos y cómputo mucho mayores. Esto afecta especialmente a la comparación con modelos preentrenados a gran escala. Por ello, el objetivo no será reproducir la calidad absoluta de un SmolLM2-135M entrenado sobre cientos de miles de millones de tokens, sino realizar una **comparación controlada entre métodos de entrenamiento**. Se priorizará que todos los modelos experimentales comparados utilicen el mismo corpus, presupuesto aproximado y condiciones de evaluación, de manera que las diferencias observadas puedan atribuirse al uso de DiffusionBlocks con mayor confianza.                                                                                                                                             |
 
 
 ### Comprobación 4 · Aplicativo
 
-- [x] Hay una capa de servicio natural encima de la replicación.
+* [x] Hay una capa de servicio natural encima de la replicación.
 
-|                                |                                                                                   |
-| ------------------------------ | --------------------------------------------------------------------------------- |
-| **Qué construís encima**       | No tenemos muy claro qué aplicativo crearemos como tal, pero una posibilidad sería una aplicación web/API de generación de imágenes o texto que permita generar contenido utilizando el modelo Diffusion Transformer o Masked Diffusion, por ejemplo. |
-| **Quién lo usaría y para qué** | Un usuario que quiera experimentar y comparar distintos métodos de entrenamiento y fine-tuning. |
-| **Qué necesita del modelo**    | 
-- Entrada: condición de generación y configuración del modelo. 
-- Salida: texto generado y metadatos de la ejecución.                                          |
+|                                |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Qué construís encima**       | Una **aplicación web/API de generación y comparación de texto** que permita interactuar con las diferentes versiones del modelo SmolLM2-135M desarrolladas durante el proyecto. El usuario podrá seleccionar entre el modelo entrenado desde cero con DiffusionBlocks, el modelo preentrenado convencionalmente y posteriormente ajustado mediante DiffusionBlocks y, como referencia, el modelo SmolLM2-135M-Instruct disponible públicamente. La aplicación permitirá introducir un prompt y comparar las respuestas generadas por los distintos modelos, mostrando también los principales parámetros y metadatos de cada ejecución. |
+| **Quién lo usaría y para qué** | Un estudiante, investigador o desarrollador interesado en **experimentar con diferentes estrategias de pretraining y fine-tuning de modelos de lenguaje**, que quiera observar de forma interactiva las diferencias entre un modelo entrenado convencionalmente y uno entrenado mediante DiffusionBlocks.                                                                                                                                                                                                                                                                                                                               |
+| **Qué necesita del modelo**    | **Entrada:** un prompt o contexto textual y los parámetros de generación relevantes, como temperatura, longitud máxima y número de tokens a generar. **Salida:** texto generado, tiempo de inferencia y metadatos sobre el modelo y configuración utilizados. La aplicación podrá permitir generar con varias versiones del modelo a partir del mismo prompt para facilitar su comparación cualitativa.                                                         |
+                            |
 
 ### Riesgo principal
 
-|                                                    |                                                                                              |
-| -------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| **Qué es lo que más probablemente va a salir mal** |    No conseguir reproducir una generación de imágenes o texto con calidad suficiente o no disponer de recursos computacionales suficientes para entrenar o fine-tunear propiamente la arquitectura escogida.                                                                           |
-| **Qué haríais si pasa**                            | Primero garantizar que el pipeline funciona con un entrenamiento reducido sobre la arquitectura seleccionada; y luego si el entrenamiento completo resulta demasiado costoso, reducir épocas y el número de configuraciones. |
+|                                                    ||
+| -------------------------------------------------- | ---------------------------------------------------- |
+| **Qué es lo que más probablemente va a salir mal** | El principal riesgo es que **el entrenamiento desde cero del modelo de 135M con DiffusionBlocks no converja adecuadamente o requiera más recursos computacionales de los disponibles**, especialmente al intentar mantener una escala de entrenamiento suficiente para obtener resultados representativos. También existe el riesgo de que el fine-tuning con DiffusionBlocks sobre el modelo preentrenado convencionalmente produzca resultados significativamente peores o inestables respecto al modelo preentrenado con DiffusionBlocks.                                                                                                                                                                                                                                                                               |
+| **Qué haríais si pasa**                            | Primero se garantizará que el pipeline completo funciona mediante **entrenamientos reducidos**, utilizando una cantidad limitada de datos y pasos para comprobar la convergencia y detectar errores en la implementación. Si el entrenamiento completo resulta demasiado costoso, se reducirá progresivamente **el número de tokens utilizados, los pasos/épocas de entrenamiento, el número de configuraciones de DiffusionBlocks y/o el tamaño efectivo de los experimentos**, manteniendo siempre una configuración base que permita realizar la comparación principal. Si el entrenamiento desde cero de 135M no resulta viable, se priorizará la experimentación de fine-tuning y las ablaciones sobre un modelo de menor escala, dejando explícitamente documentada la reducción respecto al planteamiento original. |
+
 
 ### Visto bueno del profesor (H2) · no rellenar
 
@@ -122,7 +122,7 @@ aprender aquí.
 
 ---
 
-## Propuesta 2 (alternativa)
+## Propuesta 2 (Knowledge Graphs)
 
 ### Identificación
 
