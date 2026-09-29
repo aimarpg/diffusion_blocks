@@ -84,16 +84,15 @@ aprender aquí.
 
 ### Comprobación 3 · Cómputo · la regla 5/20
 
-- [ ] Cabe en el presupuesto, **con el plan de recorte escrito**.
+* [x] Cabe en el presupuesto, **con el plan de recorte escrito**.
 
-|                                                |                                                                                                                   |
-| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **Escala del paper original**                  | DiT-S/2 sobre CIFAR-10, con 100 épocas, batch size 512, AdamW y LR 5e-5. Para el experimento de 3 bloques, el modelo tiene 12 capas y se divide en 3 bloques de 4 capas.                                                          |
-| **Escala que vais a hacer vosotros**           | DiT-S/2 + CIFAR-10, manteniendo la arquitectura y configuración del paper en la medida en que estén especificadas. Como primera fase, se realizará una reproducción reducida de 10–20 épocas para validar que el pipeline funciona.                                                                       |
-| **Tiempo estimado del entrenamiento completo** | Se realizará primero una prueba piloto de 1 época en el hardware definitivo y se medirá el tiempo real por época. Basado en eso se estimará el tiempo total añadiendo un margen del 15–20 % para evaluación.                                         
-| **Qué se pierde al recortar**                  | Puede producir una peor calidad de generación y resultados FID menos estables que los del paper. Por tanto, los resultados obtenidos con este entrenamiento no se interpretarán como una reproducción exacta. |
-| **Hardware que vais a usar**                   | GPU en la nube (Google Colab) u otra GPU disponible en los laboratorios de la universidad. También una GPU disponible.
-|
+|                                                |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Escala del paper original**                  | **Reproducción en texto:** Transformer basado en DiT sobre un corpus de texto, siguiendo la configuración del paper para modelos de difusión de texto: 12 capas y 3 DiffusionBlocks. **Experimento autoregresivo:** modelo de aproximadamente 135M de parámetros basado en la arquitectura SmolLM2-135M, entrenado desde cero mediante DiffusionBlocks. El paper evalúa además diferentes configuraciones de bloques y distribuciones de los niveles de ruido/corrupción.                                                                                                       |
+| **Escala que vais a hacer vosotros**           | Se realizarán dos líneas experimentales. **(1) Modelo autoregresivo:** se entrenará desde cero un modelo de aproximadamente **135M de parámetros basado en SmolLM2-135M**, utilizando **TinyStories** en lugar de un corpus de cientos de miles de millones de tokens. Posteriormente, este modelo será utilizado para estudiar el fine-tuning mediante DiffusionBlocks. Como referencia, también se realizará fine-tuning mediante el mismo procedimiento sobre el checkpoint preentrenado oficial de SmolLM2-135M, que no fue preentrenado originalmente con DiffusionBlocks. |
+| **Tiempo estimado del entrenamiento completo** | Antes de ejecutar los experimentos completos se realizará una **prueba piloto** en el hardware definitivo, midiendo tiempo por paso/época, consumo máximo de VRAM y número de tokens procesados por segundo. Estas medidas se utilizarán para estimar el tiempo de cada configuración y seleccionar el número máximo de pasos compatible con el presupuesto computacional. Se reservará además un margen aproximado del **15–20 %** para evaluación, generación de muestras y ablaciones.                                                                                                          |
+| **Qué se pierde al recortar**                  | El principal efecto del recorte será una menor convergencia y calidad absoluta respecto a modelos entrenados con cantidades de datos y cómputo mucho mayores. Esto afecta especialmente a la comparación con modelos preentrenados a gran escala. Por ello, el objetivo no será reproducir la calidad absoluta de un SmolLM2-135M entrenado sobre cientos de miles de millones de tokens, sino realizar una **comparación controlada entre métodos de entrenamiento**. Se priorizará que todos los modelos experimentales comparados utilicen el mismo corpus, presupuesto aproximado y condiciones de evaluación, de manera que las diferencias observadas puedan atribuirse al uso de DiffusionBlocks con mayor confianza.                                                                                                                                             |
+
 
 ### Comprobación 4 · Aplicativo
 
@@ -105,7 +104,7 @@ aprender aquí.
 | **Quién lo usaría y para qué** | Un usuario que quiera experimentar y comparar distintos métodos de entrenamiento y fine-tuning. |
 | **Qué necesita del modelo**    | 
 - Entrada: condición de generación y configuración del modelo. 
-- Salida: imagen o texto generado y metadatos de la ejecución.                                          |
+- Salida: texto generado y metadatos de la ejecución.                                          |
 
 ### Riesgo principal
 
@@ -165,7 +164,7 @@ aprender aquí.
 
 |                                                |                                                                                                                   |
 | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **Escala del paper original**                  | _Dataset completo, N épocas, qué hardware, cuánto tardó_                                                          |
+| **Escala del paper original**                  | Smoltalk (https://huggingface.co/datasets/HuggingFaceTB/smoltalk) 1.04M de entrenamiento, 54.9k test                                                          |
 | **Escala que vais a hacer vosotros**           | _Subset de N, M épocas, modelo reducido a…_                                                                       |
 | **Tiempo estimado del entrenamiento completo** | _En minutos, en la máquina que vayáis a usar, y cómo lo habéis medido_                                            |
 | **Qué se pierde al recortar**                  | _La respuesta honesta. «La métrica bajará de 0.72 a algo en torno a 0.6» es una buena respuesta; «nada» no lo es_ |
