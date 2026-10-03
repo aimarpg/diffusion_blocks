@@ -21,10 +21,20 @@ from pathlib import Path
 
 DESTINO = Path("data")
 
-# Rellena esto con tu dataset. El hash se obtiene la primera vez con
-# `python scripts/get_data.py --hash`.
+_HF_TINYSTORIES = ("https://huggingface.co/datasets/roneneldan/TinyStories/resolve/"
+       "f54c09fd23315a6f9c86f9dc80f725de7d8f9c64/data/")
+
 FUENTES = [
-    # ("https://.../train.tar.gz", "train.tar.gz", "sha256:abc123..."),
+    (_HF_TINYSTORIES + "train-00000-of-00004-2d5a1467fff1081b.parquet", "train-00000-of-00004.parquet",
+     "sha256:77cf780cebe52b6e83e3a2ac84bc56d8059363113e41d17a023f1d8b2ed0fc0b"),
+    (_HF_TINYSTORIES + "train-00001-of-00004-5852b56a2bd28fd9.parquet", "train-00001-of-00004.parquet",
+     "sha256:e2f173a6dcc2b5895183e8ad376e115bd5c06764eb0cfc01ce1add156b2d017f"),
+    (_HF_TINYSTORIES + "train-00002-of-00004-a26307300439e943.parquet", "train-00002-of-00004.parquet",
+     "sha256:cac73cd1a0973a7fccde022a5a5c78f8ba58ea6849541835c58e7c5fc747f2ef"),
+    (_HF_TINYSTORIES + "train-00003-of-00004-d243063613e5a057.parquet", "train-00003-of-00004.parquet",
+     "sha256:862514ae75723ddd339337f1ef7617b88f82290dcddd57445e1d38d257ca7891"),
+    (_HF_TINYSTORIES + "validation-00000-of-00001-869c898b519ad725.parquet", "validation.parquet",
+     "sha256:33406a6206554cfc279c29c11f4df51528af487aa1a602b075566fc83c49dcab"),
 ]
 
 

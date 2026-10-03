@@ -16,4 +16,5 @@ comprueba en la defensa.
 | Fecha     | Tarea                              | Herramienta | Qué devolvió                                                                    | Qué hicimos y por qué                                                               |
 | --------- | ---------------------------------- | ----------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | 3-octubre | Encontrar ambigüedades en el paper | Claude Code | Una lista de posibles ambigüedades del paper y la implementación de referencia. | Revisarlas, escoger las que tenían sentido, buscar soluciones y redactar el README. |
+| 3-octubre | Añadir el dataset a get_data.py    | Claude Code | Las URLs y hashes                                                               | Comprobar que funciona y limpiar el código                                          |
 ---
