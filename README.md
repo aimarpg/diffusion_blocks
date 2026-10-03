@@ -1,29 +1,17 @@
-<!--
-PLANTILLA. Sustituye TODO lo que va entre <angulos>. Borra este comentario.
+# Diffusion blocks on decoder-only LLM
 
-Un README se lee en treinta segundos o no se lee. Quien lo abre quiere saber
-tres cosas: qué es esto, cómo lo ejecuto, y funcionó o no. En ese orden.
+Replicación de **Shing, M., Koyama, M., & Akiba, T. (2026). DiffusionBlocks: Block-wise Neural Network Training via Diffusion Interpretation** sobre **TinyStories**, con aplicativo: comparador web construido encima.
 
-Recuerda que en noviembre otra pareja va a clonar este repositorio y va a
-intentar reproducir una métrica SIN PREGUNTAROS NADA. Este fichero es lo único
-que van a tener.
--->
-
-# <Título del proyecto>
-
-Replicación de **<Autores, año · Título del paper>** sobre **<dataset>**,
-con <aplicativo: buscador semántico / detector en vídeo / lo que sea> construido encima.
-
-- **Paper:** <enlace a arXiv o DOI>
-- **Implementación de referencia:** <enlace, o «ninguna: el paper se implementa desde cero»>
-- **Seguimiento de experimentos:** <enlace al proyecto de W&B — obligatorio>
-- **Autoría:** <Nombre 1>, <Nombre 2>
+- **Paper:** https://arxiv.org/abs/2506.14202
+- **Implementación de referencia:** https://github.com/SakanaAI/DiffusionBlocks
+- **Seguimiento de experimentos:** https://wandb.ai/trabajo-integrado/diffusion-blocks
+- **Autoría:** Aimar Pagonabarraga Gallastegui, Jaime Etxebarria Ugarte
 
 ## Resultado
 
-| Métrica | Paper | Nuestra réplica | Escala |
-|---|---|---|---|
-| <accuracy> | <0.72> | <0.68> | <CIFAR-10, subset de 5.000> |
+| Métrica    | Paper  | Nuestra réplica | Escala                      |
+| ---------- | ------ | --------------- | --------------------------- |
+| <accuracy> | <0.72> | <0.68>          | <CIFAR-10, subset de 5.000> |
 
 <Una frase honesta sobre la diferencia. Una desviación bien explicada puntúa
 igual que un acierto; una desviación sin explicar, no.>
@@ -31,8 +19,8 @@ igual que un acierto; una desviación sin explicar, no.>
 ## Instalación
 
 ```bash
-git clone <url>
-cd <repo>
+git clone https://github.com/aimarpg/diffusion_blocks
+cd diffusion_blocks
 python -m venv .venv && source .venv/bin/activate    # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
@@ -43,8 +31,8 @@ pip install -r requirements.txt
 python scripts/get_data.py
 ```
 
-Descarga <dataset> de <origen oficial> y verifica el SHA-256. Ocupa <N> GB.
-Licencia: <licencia del dataset>.
+Descarga TinyStories de https://huggingface.co/datasets/roneneldan/TinyStories y verifica los SHA-256. Ocupa ~1 GB.
+Licencia: [Community Data License Agreement – Sharing, Version 1.0](https://cdla.dev/sharing-1-0/)
 
 ## Ejecución
 
@@ -52,8 +40,12 @@ Licencia: <licencia del dataset>.
 # Smoke test: el pipeline entero en miniatura. Menos de 5 minutos en CPU.
 python run.py --smoke
 
+python run.py --config configs/fast.yaml
+
 # Entrenamiento completo. Menos de 20 minutos en una T4 de Colab gratuito.
 python run.py --config configs/default.yaml
+
+python run.py --config configs/full.yaml
 
 # El aplicativo, sobre el checkpoint entrenado.
 python -m src.app.serve --checkpoint checkpoints/mejor.pt
@@ -76,7 +68,7 @@ run.py        Punto de entrada único
 
 - Semilla fijada en `src/utils/seed.py`, valor en `configs/`.
 - Dependencias con versión exacta en `requirements.txt`.
-- Presupuesto de cómputo declarado: **<tiempo real> en <hardware>**.
+- Presupuesto de cómputo declarado: **<tiempo real> en RTX 4090**.
 - Qué se recortó respecto al paper y qué se pierde con ello: <explicación>.
 
 ## Decisiones donde el paper no especifica
@@ -84,9 +76,14 @@ run.py        Punto de entrada único
 <La sección que distingue replicar de copiar. Lista lo que tuvisteis que
 decidir vosotros y con qué criterio. Sale de la ficha de replicación.>
 
-| Ambigüedad del paper | Qué decidimos | Por qué |
-|---|---|---|
-| <no dice el schedule de lr> | <cosine con warmup de 5 épocas> | <es lo habitual en la familia de trabajos citada> |
+Para resolver cada ambigüedad miramos el código oficial (que solo cubre ViT con CIFAR-100), y si es necesario, los trabajos citados en el paper. Si no resuelven la ambigüedad, decidimos nosotros.
+
+| Ambigüedad del paper                                                                           | Qué decidimos                                                                | Por qué                                                                                                                                                                                                                                          |
+| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| El paper usa 12 capas repartidas en 4 bloques. SmolLM2-135M tiene 30, que no es múltiplo de 4. | Usar 3 bloques de 10 capas.                                                  | Según las tablas 7 y 11 del paper, usando una distribución equiprobable de rangos de ruido gausiano, repartir las capas a partes iguales da el mejor resultado, y usar 3 o 4 bloques da resultados similares (MAUVE 0.65 y 0.67 respectivamente) |
+| No da la longitud del prompt ni el modelo de features para MAUVE.                              | Prompt de 50 tokens, 50 generados, features con GPT-2 Large.                 | Protocolo del paper de SEDD (Lou et al., 2024), que es el que cita el paper y GPT-2 Large es el valor por defecto de `mauve-text`.                                                                                                               |
+| Condicionamiento de ruido σ "como en DiT", sin detalles, y SmolLM2 usa RMSNorm.                | adaLN-Zero tras cada RMSNorm, con σ codificado en un vector de dimensión 96. | Como en `vit.py` del código oficial (`hidden_size // 6`). Añade ~10.5 M parámetros (~8 %) que el base no tiene.                                                                                                                                  |
+
 
 ## Tests
 
