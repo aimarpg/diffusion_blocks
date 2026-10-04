@@ -124,146 +124,80 @@ aprender aquí.
 
 ## Propuesta 2 (Knowledge Graphs)
 
-### Identificación
+**### Identificación**
 
-|                            |                                                                     |
-| -------------------------- | ------------------------------------------------------------------- |
-| **Paper o referencia**     | _Título completo_                                                   |
-| **Autores y año**          |                                                                     |
-| **Enlace**                 | _arXiv, DOI o web del paper_                                        |
-| **Vía**                    | A (lista curada) / B (propuesta propia)                             |
-| **Por qué este y no otro** | _Dos líneas. Idealmente conectado con el rol profesional de arriba_ |
+|                                |                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ****Paper o referencia****     | *Towards Practical GraphRAG: Efficient Knowledge Graph Construction and Hybrid Retrieval at Scale*                                                                                                                                                                                                                    |
+| ****Autores y año****          | Congmin Min, Sahil Bansal, Joyce Pan, Abbas Keshavarzi, Rhea Mathew y Amar Viswanathan Kannan, 2025                                                                                                                                                                                                                   |
+| ****Enlace****                 | *https://arxiv.org/abs/2507.03226*                                                                                                                                                                                                                                                                                    |
+| ****Vía****                    | A (lista curada)                                                                                                                                                                                                                                                                                                      |
+| ****Por qué este y no otro**** | El paper aborda directamente la construcción eficiente de Knowledge Graphs a partir de texto, comparando técnicas basadas en LLMs y dependency parsing. Además, permite plantear una aportación propia mediante un sistema adaptativo que combine ambos enfoques según la complejidad o confianza de cada extracción. |
 
-### Comprobación 1 · Datos
+**### Comprobación 1 · Datos**
 
-- [ ] Son **públicos y descargables hoy**. Enlace que funciona, no una promesa.
-- [ ] La licencia permite el uso académico.
+* [x] Son ****públicos y descargables hoy****. Enlace que funciona, no una promesa.
+* [x] La licencia permite el uso académico.
 
-|                                       |                                                                |
-| ------------------------------------- | -------------------------------------------------------------- |
-| **Dataset**                           |                                                                |
-| **Enlace de descarga**                |                                                                |
-| **Tamaño**                            | _En MB/GB y en número de ejemplos_                             |
-| **Licencia**                          |                                                                |
-| **¿Hace falta registro o solicitud?** | _Si la respuesta es «hay que pedir acceso y tardan», es un no_ |
+|                                           |                                                                                                 |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| ****Dataset****                           | **REBEL (Relation Extraction By End-to-end Language generation)**                               |
+| ****Enlace de descarga****                | *https://huggingface.co/datasets/Babelscape/rebel-dataset*                                      |
+| ****Tamaño****                            | Aproximadamente **220.000 ejemplos** de texto con triples de relaciones extraídos de Wikipedia. |
+| ****Licencia****                          | **CC BY-SA 3.0**                                                                                |
+| ****¿Hace falta registro o solicitud?**** | **No.** Descarga pública y directa desde Hugging Face.                                          |
+|                                           
+|                                                   
+| ****Dataset complementario****                           | **WebNLG / WebNLG2**                               |
+| ****Enlace de descarga****                | *https://gitlab.com/webnlg/webnlg-dataset?utm_source=chatgpt.com*                                      |
+| ****Tamaño****                            | Del orden de decenas de miles de triples y pares texto–triple, dependiendo de la versión utilizada. |
+| ****Licencia****                          | **CC BY-NC-SA 4.0**                                                                                |
+| ****¿Hace falta registro o solicitud?**** | **No.** No. Descarga pública.                                          |
 
-### Comprobación 2 · Especificación
-
-- [ ] Hay implementación de referencia, **o bien** el paper especifica la arquitectura lo bastante como
-      para implementarla sin adivinar.
-
-|                                                          |                                                                                                               |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| **¿Hay código de referencia?**                           | _Sí (enlace) / No_                                                                                            |
-| **Si no lo hay, ¿el paper da la arquitectura completa?** | _Capas, dimensiones, función de pérdida, optimizador_                                                         |
-| **Qué NO especifica el paper**                           | _Lo importante. Si la lista está vacía, no habéis leído el paper con suficiente atención: siempre falta algo_ |
-
-### Comprobación 3 · Cómputo · la regla 5/20
-
-- [ ] Cabe en el presupuesto, **con el plan de recorte escrito**.
-
-|                                                |                                                                                                                   |
-| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **Escala del paper original**                  | Smoltalk (https://huggingface.co/datasets/HuggingFaceTB/smoltalk) 1.04M de entrenamiento, 54.9k test                                                          |
-| **Escala que vais a hacer vosotros**           | _Subset de N, M épocas, modelo reducido a…_                                                                       |
-| **Tiempo estimado del entrenamiento completo** | _En minutos, en la máquina que vayáis a usar, y cómo lo habéis medido_                                            |
-| **Qué se pierde al recortar**                  | _La respuesta honesta. «La métrica bajará de 0.72 a algo en torno a 0.6» es una buena respuesta; «nada» no lo es_ |
-| **Hardware que vais a usar**                   | _Portátil / Colab gratuito / otro_                                                                                |
-
-### Comprobación 4 · Aplicativo
-
-- [ ] Hay una capa de servicio natural encima de la replicación.
-
-|                                |                                                                                   |
-| ------------------------------ | --------------------------------------------------------------------------------- |
-| **Qué construís encima**       | _Un buscador, un detector en vídeo, una API, un panel…_                           |
-| **Quién lo usaría y para qué** | _Una frase. Si no se os ocurre, el proyecto no cumple el objetivo del aplicativo_ |
-| **Qué necesita del modelo**    | _Entrada, salida, latencia aceptable_                                             |
-
-### Riesgo principal
-
-|                                                    |                                                                                              |
-| -------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| **Qué es lo que más probablemente va a salir mal** |                                                                                              |
-| **Qué haríais si pasa**                            | _Útil: «si no converge, reducimos a MNIST y lo declaramos». Inútil: «nada, está controlado»_ |
-
-### Visto bueno del profesor (H2) · no rellenar
-
-|                 |                                            |
-| --------------- | ------------------------------------------ |
-| **Decisión**    | Aprobado / Aprobado con recorte / Devuelto |
-| **Condiciones** |                                            |
-
----
-
-## Propuesta 3 (alternativa)
-
-### Identificación
-
-|                            |                                                                     |
-| -------------------------- | ------------------------------------------------------------------- |
-| **Paper o referencia**     | _Título completo_                                                   |
-| **Autores y año**          |                                                                     |
-| **Enlace**                 | _arXiv, DOI o web del paper_                                        |
-| **Vía**                    | A (lista curada) / B (propuesta propia)                             |
-| **Por qué este y no otro** | _Dos líneas. Idealmente conectado con el rol profesional de arriba_ |
-
-### Comprobación 1 · Datos
-
-- [ ] Son **públicos y descargables hoy**. Enlace que funciona, no una promesa.
-- [ ] La licencia permite el uso académico.
-
-|                                       |                                                                |
-| ------------------------------------- | -------------------------------------------------------------- |
-| **Dataset**                           |                                                                |
-| **Enlace de descarga**                |                                                                |
-| **Tamaño**                            | _En MB/GB y en número de ejemplos_                             |
-| **Licencia**                          |                                                                |
-| **¿Hace falta registro o solicitud?** | _Si la respuesta es «hay que pedir acceso y tardan», es un no_ |
 
 ### Comprobación 2 · Especificación
 
-- [ ] Hay implementación de referencia, **o bien** el paper especifica la arquitectura lo bastante como
-      para implementarla sin adivinar.
+* [x] Hay implementación de referencia, **o bien** el paper especifica la arquitectura lo bastante como para implementarla sin adivinar.
 
-|                                                          |                                                                                                               |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| **¿Hay código de referencia?**                           | _Sí (enlace) / No_                                                                                            |
-| **Si no lo hay, ¿el paper da la arquitectura completa?** | _Capas, dimensiones, función de pérdida, optimizador_                                                         |
-| **Qué NO especifica el paper**                           | _Lo importante. Si la lista está vacía, no habéis leído el paper con suficiente atención: siempre falta algo_ |
+|                                                              |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ****¿Hay código de referencia?****                           | **Sí, parcialmente.** El trabajo dispone de implementación asociada al método y describe los principales componentes del pipeline. Los autores proporcionan información sobre el proceso de extracción de relaciones y referencias (NER, dependency parsing, coreference resolution, reglas adicionales para estructuras más complejas).                                                                                                                                                                                                                                                                                                         |
+| ****Si no lo hay, ¿el paper da la arquitectura completa?**** | El sistema está compuesto por módulos de procesamiento de texto, dependency parsing, extracción de entidades y relaciones, utilización de LLMs y posterior fusión/normalización. El paper describe estos componentes y su funcionamiento.                                                                                                                                                                                                            |
+| ****Qué NO especifica el paper****                           | El paper no proporciona todos los detalles necesarios para reproducir exactamente el sistema original, como algunos parámetros y decisiones de implementación del pipeline. El mayor contratiempo es que os datasets originales proceden de un entorno empresarial de SAP y no están disponibles públicamente, por lo que no es posible reproducir exactamente todos los experimentos. |
 
 ### Comprobación 3 · Cómputo · la regla 5/20
 
-- [ ] Cabe en el presupuesto, **con el plan de recorte escrito**.
+* [x] Cabe en el presupuesto, **con el plan de recorte escrito**.
 
-|                                                |                                                                                                                   |
-| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **Escala del paper original**                  | _Dataset completo, N épocas, qué hardware, cuánto tardó_                                                          |
-| **Escala que vais a hacer vosotros**           | _Subset de N, M épocas, modelo reducido a…_                                                                       |
-| **Tiempo estimado del entrenamiento completo** | _En minutos, en la máquina que vayáis a usar, y cómo lo habéis medido_                                            |
-| **Qué se pierde al recortar**                  | _La respuesta honesta. «La métrica bajará de 0.72 a algo en torno a 0.6» es una buena respuesta; «nada» no lo es_ |
-| **Hardware que vais a usar**                   | _Portátil / Colab gratuito / otro_                                                                                |
+|                                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ****Escala del paper original****                  | El paper trabaja con aproximadamente **550 documentos PDF**, que se dividen en unos **2.000 chunks**, además de conjuntos de evaluación específicos del entorno SAP. La extracción combina dependency parsing y LLMs y está orientada a procesamiento de documentos a gran escala.                                                                                                                                                                                                                                                                                   |
+| ****Escala que vais a hacer vosotros****           | Se utilizará un **subset de aproximadamente 10.000–20.000 ejemplos de REBEL** para los experimentos iniciales. Se realizarán varias configuraciones de extracción sobre el mismo subconjunto para poder comparar dependency parsing, LLM-based, hybrid y nuestro método adaptativo. Se utilizarán modelos preentrenados de tamaño reducido o APIs/modelos disponibles para la extracción.                                                                                                                                                       |
+| ****Tiempo estimado del entrenamiento completo**** | Para el procesamiento mediante dependency parsing, el tiempo esperado será del orden de **minutos a pocas horas**, dependiendo del tamaño del subset. La parte LLM dependerá principalmente del modelo utilizado y del número de llamadas. Se realizará una prueba piloto con **500–1.000 ejemplos** para medir el tiempo real y extrapolarlo al conjunto completo antes de ejecutar los experimentos. |
+| ****Qué se pierde al recortar****                  | Al utilizar únicamente una fracción del dataset y modelos LLM más pequeños, los resultados pueden ser menos representativos que los obtenidos a escala completa y la calidad de las extracciones puede disminuir.                                                                                         |
+| ****Hardware que vais a usar****                   | **GPU disponible mediante Google Colab o alquiler de GPUs online para determinadas partes de los experimentos.** El dependency parsing y las fases de procesamiento tradicionales se ejecutarán localmente. Para los experimentos con LLM se barajarán las opciones de GPUs.  |                  
+                                                  
 
 ### Comprobación 4 · Aplicativo
 
-- [ ] Hay una capa de servicio natural encima de la replicación.
+* [x] Hay una capa de servicio natural encima de la replicación.
 
-|                                |                                                                                   |
-| ------------------------------ | --------------------------------------------------------------------------------- |
-| **Qué construís encima**       | _Un buscador, un detector en vídeo, una API, un panel…_                           |
-| **Quién lo usaría y para qué** | _Una frase. Si no se os ocurre, el proyecto no cumple el objetivo del aplicativo_ |
-| **Qué necesita del modelo**    | _Entrada, salida, latencia aceptable_                                             |
+|                                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ****Qué construís encima****       | Una **aplicación web/API para generación de Knowledge Graphs**. El usuario podrá introducir un texto o documento, seleccionar el método de generación (dependency-based, LLM-based o nuestro método adaptativo) y visualizar las entidades y relaciones extraídas en forma de Knowledge Graph. |
+| ****Quién lo usaría y para qué**** | Investigadores, estudiantes o desarrolladores que quieran **transformar  documentos de texto en un Knowledge Graph.                                                                                                                                                                                                                            |
+| ****Qué necesita del modelo****    | **Entrada:** texto o documento proporcionado por el usuario y método de extracción seleccionado. **Salida:** entidades, relaciones y Knowledge Graph visualizable.                                                                                                 |
 
 ### Riesgo principal
 
-|                                                    |                                                                                              |
-| -------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| **Qué es lo que más probablemente va a salir mal** |                                                                                              |
-| **Qué haríais si pasa**                            | _Útil: «si no converge, reducimos a MNIST y lo declaramos». Inútil: «nada, está controlado»_ |
+|                                                        |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ****Qué es lo que más probablemente va a salir mal**** | Que el método adaptativo no consiga reducir suficientemente el uso del LLM manteniendo una calidad comparable a la extracción completamente basada en LLMs, Por otro lado, que la implementación de los diferentes pipelines resulte demasiado compleja para los recursos y tiempo disponibles.                                                                                                                                                         |
+| ****Qué haríais si pasa****                            | Reduciremos primero el tamaño del dataset y el número de experimentos, manteniendo únicamente las comparaciones esenciales. Si el sistema adaptativo no proporciona una mejora clara, se mantendrá como resultado la comparación entre dependency parsing, LLM y el método híbrido del paper. |
 
 ### Visto bueno del profesor (H2) · no rellenar
 
-|                 |                                            |
-| --------------- | ------------------------------------------ |
-| **Decisión**    | Aprobado / Aprobado con recorte / Devuelto |
-| **Condiciones** |                                            |
+|                     |                                            |
+| ------------------- | ------------------------------------------ |
+| ****Decisión****    | Aprobado / Aprobado con recorte / Devuelto |
+| ****Condiciones**** |                                            |
