@@ -6,6 +6,9 @@ esta funcion no se esta usando. El checker avisa de eso.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+from contextlib import contextmanager
+
 import os
 import random
 
@@ -31,3 +34,18 @@ def fijar_seed(seed: int, determinista: bool = True) -> None:
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
         os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+
+
+@contextmanager
+def seed_temporal(seed: int) -> Iterator[None]:
+    """Fija ruido de evaluación y restaura RNG de Python, NumPy, CPU y CUDA."""
+    python_state = random.getstate()
+    numpy_state = np.random.get_state()
+    devices = list(range(torch.cuda.device_count())) if torch.cuda.is_available() else []
+    try:
+        with torch.random.fork_rng(devices=devices):
+            fijar_seed(seed)
+            yield
+    finally:
+        random.setstate(python_state)
+        np.random.set_state(numpy_state)

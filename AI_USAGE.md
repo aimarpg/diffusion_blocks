@@ -17,4 +17,4 @@ comprueba en la defensa.
 | --------- | ---------------------------------- | ----------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | 3-octubre | Encontrar ambigüedades en el paper | Claude Code | Una lista de posibles ambigüedades del paper y la implementación de referencia. | Revisarlas, escoger las que tenían sentido, buscar soluciones y redactar el README. |
 | 3-octubre | Añadir el dataset a get_data.py    | Claude Code | Las URLs y hashes                                                               | Comprobar que funciona y limpiar el código                                          |
----
+| 5-octubre | Implementación de pruebas A/B/C y documentación | Codex | Pipeline de texto, Transformer, denoisers independientes, máscaras, sampler, perfilado y tests. | Pendiente revisión humana del método y ejecución C en T4; A/B y tests se verifican localmente. No se ha elaborado una discusión científica de resultados. |

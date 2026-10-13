@@ -14,8 +14,9 @@ Dos páginas se leen enteras. Quince, no.
 
 ## Qué es esto
 
-Replicación de <paper> sobre <dataset>. Objetivo: reproducir <métrica> = <valor>.
-Encima se construye <aplicativo>.
+Adaptación de DiffusionBlocks a una arquitectura SmolLM2-135M sobre TinyStories.
+Objetivo inicial: validar ejecución, aprendizaje mínimo y recursos con pruebas A/B/C.
+Después se construirá un comparador de generación de texto. Diseño en docs/pruebas_viabilidad.md.
 
 ## Restricciones del curso
 
@@ -54,6 +55,8 @@ python tools/tiiac_check.py .                  # comprobador de reproducibilidad
 <Actualiza esto cuando cambie. Es lo que evita que el asistente reinvente
 piezas que ya existen.>
 
-- Hecho: <...>
-- En curso: <...>
-- Pendiente: <...>
+- Hecho: pruebas A/B/C configurables, Transformer con GQA/RoPE, denoising independiente, sampler, cache de texto y documentación. A/B usan fixture offline; C usa TinyStories y tokenizer oficial.
+- Verificado en CPU Mac Intel/PyTorch 2.2.2: A/B pasan, 18 tests pasan y tiiac_check da 95/100. Codebook congelado en ambos pilotos; no importar aún pesos oficiales.
+- En curso: medición de viabilidad C pendiente de hardware CUDA/T4.
+- Pendiente: ejecutar C en T4, decidir embeddings/cabezas del experimento principal, evaluar calidad, fine-tuning y aplicativo.
+- Los módulos placeholder y sus tests se conservan por compatibilidad; run.py ejecuta src/training/probes.py.

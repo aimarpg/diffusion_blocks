@@ -1,96 +1,84 @@
-# Diffusion blocks on decoder-only LLM
+# DiffusionBlocks sobre una arquitectura SmolLM2-135M
 
-Replicación de **Shing, M., Koyama, M., & Akiba, T. (2026). DiffusionBlocks: Block-wise Neural Network Training via Diffusion Interpretation** sobre **TinyStories**, con aplicativo: comparador web construido encima.
+Adaptación experimental de **Shing, Koyama y Akiba, DiffusionBlocks: Block-wise Neural Network Training via Diffusion Interpretation** a una arquitectura de tamaños SmolLM2-135M sobre TinyStories. El objetivo inicial es comprobar entrenamiento por bloques, aprendizaje mínimo y presupuesto de cómputo; todavía no hay una réplica de calidad del paper.
 
-- **Paper:** https://arxiv.org/abs/2506.14202
-- **Implementación de referencia:** https://github.com/SakanaAI/DiffusionBlocks
-- **Seguimiento de experimentos:** https://wandb.ai/trabajo-integrado/diffusion-blocks
-- **Autoría:** Aimar Pagonabarraga Gallastegui, Jaime Etxebarria Ugarte
-
-## Resultado
-
-| Métrica    | Paper  | Nuestra réplica | Escala                      |
-| ---------- | ------ | --------------- | --------------------------- |
-| <accuracy> | <0.72> | <0.68>          | <CIFAR-10, subset de 5.000> |
-
-<Una frase honesta sobre la diferencia. Una desviación bien explicada puntúa
-igual que un acierto; una desviación sin explicar, no.>
+- [Paper](https://arxiv.org/abs/2506.14202)
+- [Implementación oficial de referencia, ViT](https://github.com/SakanaAI/DiffusionBlocks)
+- [Configuración oficial SmolLM2-135M](https://huggingface.co/HuggingFaceTB/SmolLM2-135M/blob/main/config.json)
+- [W&B](https://wandb.ai/trabajo-integrado/diffusion-blocks)
+- Autoría: Aimar Pagonabarraga Gallastegui, Jaime Etxebarria Ugarte.
 
 ## Instalación
 
+Python 3.11 recomendado. Desde la raíz del repositorio:
+
 ```bash
-git clone https://github.com/aimarpg/diffusion_blocks
-cd diffusion_blocks
-python -m venv .venv && source .venv/bin/activate    # Windows: .venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Datos
+En Mac Intel, para A/B y tests, usar `pip install -r requirements-macos-intel.txt` en lugar del fichero principal. C requiere Linux/CUDA y está preparado para T4.
+
+## Pruebas implementadas
+
+La explicación del método, máscaras, criterios de aceptación, limitaciones y ejecución en Colab está en [docs/pruebas_viabilidad.md](docs/pruebas_viabilidad.md).
 
 ```bash
-python scripts/get_data.py
-```
-
-Descarga TinyStories de https://huggingface.co/datasets/roneneldan/TinyStories y verifica los SHA-256. Ocupa ~1 GB.
-Licencia: [Community Data License Agreement – Sharing, Version 1.0](https://cdla.dev/sharing-1-0/)
-
-## Ejecución
-
-```bash
-# Smoke test: el pipeline entero en miniatura. Menos de 5 minutos en CPU.
+# A: pipeline completo reducido, CPU, menos de 5 minutos
 python run.py --smoke
 
-python run.py --config configs/fast.yaml
+# B: aprendizaje mínimo sobre ocho historias repetidas
+python run.py --config configs/overfit.yaml
 
-# Entrenamiento completo. Menos de 20 minutos en una T4 de Colab gratuito.
-python run.py --config configs/default.yaml
+# C: preparar TinyStories y tokenizer, una sola vez y fuera del entrenamiento
+python scripts/prepare_pilot.py --config configs/prepare_pilot.yaml
 
-python run.py --config configs/full.yaml
+# C: dos procesos separados, en CUDA/T4
+python run.py --config configs/pilot_baseline.yaml
+python run.py --config configs/pilot_diffusion.yaml
 
-# El aplicativo, sobre el checkpoint entrenado.
-python -m src.app.serve --checkpoint checkpoints/mejor.pt
+# Comparar recursos de las ejecuciones C
+python scripts/compare_pilot.py \
+  --baseline runs/prueba_c_baseline/report.json \
+  --diffusion runs/prueba_c_diffusion/report.json
+
+pytest tests/ -q
+python tools/tiiac_check.py .
 ```
+
+A/B usan historias de prueba escritas localmente y tokenizer de bytes, sin descargas. C usa el tokenizer oficial y TinyStories con splits oficiales, revisiones resueltas a SHA y hashes del cache tokenizado. No hay importación de pesos oficiales: los modelos se inicializan desde cero.
+
+`configs/default.yaml` es una copia del piloto C diffusion, no un entrenamiento científico completo ya validado. Los comandos CPU explícitos son A y B.
+
+## Artefactos y seguimiento
+
+Cada prueba escribe checkpoint, muestra, pasos e informe JSON en `runs/prueba_*`. La salida es 0 si se cumplen sus criterios y 1 si no. Los errores se propagan y dejan `failure.json` una vez creada la carpeta de salida.
+
+W&B registra todos los entrenamientos en modo offline por defecto. Para sincronizar después: `wandb login` y `wandb sync wandb/offline-run-*`. Los valores de las semillas están en configs y se fijan a través de `src/utils/seed.py`.
+
+## Alcance actual
+
+DiffusionBlocks usa tres bloques de diez capas en C, ruido en embeddings, condicionamiento propio por bloque y una máscara que permite pasado limpio sin revelar el token objetivo. La generación recorre los intervalos mediante Euler.
+
+**Decisión de viabilidad:** el embedding y la proyección de salida están ligados y congelados en ambos pilotos C. Los adaptadores añaden parámetros a diffusion. Los informes distinguen parámetros totales y entrenables. Este prototipo no demuestra aún preentrenamiento completo, calidad competitiva ni viabilidad temporal en T4: C debe ejecutarse allí.
+
+La aplicación web y el fine-tuning de checkpoints oficiales quedan pendientes. El servicio heredado es una plantilla y no consume aún los checkpoints de estas pruebas.
 
 ## Estructura
 
-```
-configs/      Todos los hiperparámetros. Ninguno escrito a fuego en el código
-src/data/     Carga, splits y transformaciones
-src/models/   La arquitectura replicada
-src/training/ Bucle de entrenamiento y evaluación
-src/app/      La capa de servicio: carga un checkpoint y responde
-scripts/      Descarga de datos y utilidades
-tests/        Tests de forma, invariancia y reproducibilidad
-run.py        Punto de entrada único
-```
-
-## Reproducibilidad
-
-- Semilla fijada en `src/utils/seed.py`, valor en `configs/`.
-- Dependencias con versión exacta en `requirements.txt`.
-- Presupuesto de cómputo declarado: **<tiempo real> en RTX 4090**.
-- Qué se recortó respecto al paper y qué se pierde con ello: <explicación>.
-
-## Decisiones donde el paper no especifica
-
-<La sección que distingue replicar de copiar. Lista lo que tuvisteis que
-decidir vosotros y con qué criterio. Sale de la ficha de replicación.>
-
-Para resolver cada ambigüedad miramos el código oficial (que solo cubre ViT con CIFAR-100), y si es necesario, los trabajos citados en el paper. Si no resuelven la ambigüedad, decidimos nosotros.
-
-| Ambigüedad del paper                                                                           | Qué decidimos                                                                | Por qué                                                                                                                                                                                                                                          |
-| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| El paper usa 12 capas repartidas en 4 bloques. SmolLM2-135M tiene 30, que no es múltiplo de 4. | Usar 3 bloques de 10 capas.                                                  | Según las tablas 7 y 11 del paper, usando una distribución equiprobable de rangos de ruido gausiano, repartir las capas a partes iguales da el mejor resultado, y usar 3 o 4 bloques da resultados similares (MAUVE 0.65 y 0.67 respectivamente) |
-| No da la longitud del prompt ni el modelo de features para MAUVE.                              | Prompt de 50 tokens, 50 generados, features con GPT-2 Large.                 | Protocolo del paper de SEDD (Lou et al., 2024), que es el que cita el paper y GPT-2 Large es el valor por defecto de `mauve-text`.                                                                                                               |
-| Condicionamiento de ruido σ "como en DiT", sin detalles, y SmolLM2 usa RMSNorm.                | adaLN-Zero tras cada RMSNorm, con σ codificado en un vector de dimensión 96. | Como en `vit.py` del código oficial (`hidden_size // 6`). Añade ~10.5 M parámetros (~8 %) que el base no tiene.                                                                                                                                  |
-
-
-## Tests
-
-```bash
-pytest tests/ -q
+```text
+configs/                  Hiperparámetros y presupuestos de cada prueba
+src/data/text.py          Tokenización offline y cache de TinyStories
+src/models/language.py    Transformer, máscaras, denoisers y sampler
+src/models/factory.py     Selección de arquitectura
+src/training/probes.py    Entrenamiento, evaluación fija y perfilado
+src/utils/                Semillas y seguimiento W&B
+scripts/prepare_pilot.py   Preparación de datos para C
+scripts/compare_pilot.py   Comparación de recursos bajo condiciones iguales
+tests/                    Contratos de causalidad, aislamiento y reproducibilidad
+docs/                     Diseño y guía de ejecución
+run.py                    Entrada única
 ```
 
-## Uso de IA
-
-Documentado en [`AI_USAGE.md`](AI_USAGE.md), según la guía docente.
+Uso de IA documentado en [AI_USAGE.md](AI_USAGE.md).

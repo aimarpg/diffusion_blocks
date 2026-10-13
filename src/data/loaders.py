@@ -22,9 +22,8 @@ class DatasetPlaceholder(Dataset):
     """
 
     def __init__(self, n: int = 512, dim: int = 32, clases: int = 10):
-        g = torch.Generator().manual_seed(0)
-        self.x = torch.randn(n, dim, generator=g)
-        self.y = torch.randint(0, clases, (n,), generator=g)
+        self.x = torch.randn(n, dim)
+        self.y = torch.randint(0, clases, (n,))
 
     def __len__(self) -> int:
         return len(self.x)

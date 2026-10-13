@@ -1,0 +1,7 @@
+# Alternativa CPU Mac Intel: PyTorch dejó de publicar wheels x86_64 macOS después de 2.2.
+# Para Colab/T4 usar requirements.txt.
+torch==2.2.2
+numpy==1.26.4
+pyyaml==6.0.2
+wandb==0.18.7
+pytest==8.3.4

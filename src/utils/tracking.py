@@ -17,8 +17,7 @@ def abrir_run(cfg: dict) -> Any | None:
     try:
         import wandb
     except ImportError:
-        print("aviso: wandb no esta instalado; se sigue sin registrar")
-        return None
+        raise RuntimeError("Instala wandb: todo entrenamiento debe registrarse")
 
     return wandb.init(
         project=wcfg.get("proyecto", "tiiac-2026"),

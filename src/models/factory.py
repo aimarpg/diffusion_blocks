@@ -25,7 +25,11 @@ class ModeloPlaceholder(nn.Module):
 
 
 def construir_modelo(cfg: dict) -> nn.Module:
+    """Construye la arquitectura seleccionada en configs/."""
     nombre = cfg["modelo"]["nombre"]
+    if nombre == "language":
+        from src.models.language import LanguageModel
+        return LanguageModel(cfg["modelo"])
     if nombre == "mi_modelo":
         return ModeloPlaceholder()
     raise ValueError(f"modelo desconocido: {nombre}")

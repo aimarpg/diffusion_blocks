@@ -1,0 +1,8 @@
+# Preparación separada del tiempo de entrenamiento. Resuelve refs y guarda sus SHAs.
+dataset_id: roneneldan/TinyStories
+dataset_revision: main
+tokenizer_id: HuggingFaceTB/SmolLM2-135M
+tokenizer_revision: main
+output: data/pilot_tokens
+train_stories: 256
+validation_stories: 32
