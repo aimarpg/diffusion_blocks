@@ -1,6 +1,6 @@
 # B: descenso de pérdida por bloque sobre ocho historias repetidas.
 experimento:
-  nombre: prueba_b_overfit
+  nombre: prueba_b_overfit_por_bloque
   prueba: B
   seed: 42
 modelo:

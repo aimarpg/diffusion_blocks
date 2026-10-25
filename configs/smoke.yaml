@@ -1,6 +1,6 @@
 # A: pipeline completo de denoising reducido, offline en CPU.
 experimento:
-  nombre: prueba_a_smoke
+  nombre: prueba_a_smoke_por_bloque
   prueba: A
   seed: 42
 modelo:
