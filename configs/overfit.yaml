@@ -54,6 +54,7 @@ evaluacion:
   seed: 123
   max_batches: 16
   minimum_relative_drop: 0.02
+  eval_every: 0
 generacion:
   prompt: 'Once '
   max_new_tokens: 8
