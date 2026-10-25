@@ -191,6 +191,13 @@ class LanguageModel(nn.Module):
         result = self.denoise(tokens, clean + sigma[:, None, None] * noise, sigma, block)
         return F.linear(result, self.embedding.weight) / self.cfg['noise']['logit_temperature']
 
+    def _clamp(self, prediction: Tensor) -> Tensor:
+        """Clamping de Diffusion-LM: sustituye la predicción por el embedding de su token más probable."""
+        if not self.cfg['noise']['clamp']:
+            return prediction
+        # Sin esto la media posterior queda entre embeddings y la trayectoria nunca se compromete a un token.
+        return self.embedding(F.linear(prediction, self.embedding.weight).argmax(-1))
+
     @torch.no_grad()
     def generate(self, prompt: Tensor, count: int) -> Tensor:
         """Genera autoregresivamente; diffusion integra desde ruido por todos los bloques."""
@@ -207,9 +214,11 @@ class LanguageModel(nn.Module):
                     steps = torch.linspace(float(self.boundaries[block]), float(self.boundaries[block + 1]), self.cfg['noise']['steps_per_block'] + 1, device=tokens.device)
                     for current, following in zip(steps[:-1], steps[1:]):
                         sigma = current.expand(candidate.size(0))
-                        prediction = self.denoise(candidate, noisy, sigma, block)
+                        prediction = self._clamp(self.denoise(candidate, noisy, sigma, block))
                         noisy = noisy + (following - current) * (noisy - prediction) / current
-                logits = F.linear(noisy[:, -1], self.embedding.weight) / self.cfg['noise']['logit_temperature']
+                # Paso final hasta sigma=0 (EDM): se decodifica la predicción, no el ruido residual de sigma_min.
+                final = self.denoise(candidate, noisy, self.boundaries[-1].expand(candidate.size(0)), len(self.blocks) - 1)
+                logits = F.linear(final[:, -1], self.embedding.weight) / self.cfg['noise']['logit_temperature']
                 next_token = logits.argmax(-1)
             tokens = torch.cat((tokens, next_token[:, None]), dim=1)
         return tokens

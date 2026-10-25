@@ -29,6 +29,8 @@ El baseline genera por argmax. DiffusionBlocks genera un token cada vez: inicial
 
 `z_next = z + (sigma_next - sigma) * (z - D(z, sigma)) / sigma`
 
+Con `noise.clamp: true`, cada predicción `D` se sustituye por el embedding de su token más probable antes del paso de Euler (truco de *clamping* de Diffusion-LM, Li et al. 2022). Tras el último bloque se decodifica la predicción del denoiser en `sigma_min`, que equivale al paso final de EDM hasta `sigma=0`, y no el estado ruidoso. Sin ambas cosas la media posterior queda entre embeddings, la trayectoria conserva la dirección del ruido inicial (coseno 0,99) y el argmax final depende solo de la seed: dos modelos distintos generaban los mismos tokens aleatorios (ver D).
+
 Después proyecta al vocabulario y toma argmax. El prompt limpio permanece fijo. El número de pasos por bloque está en config; no se usa directamente `transformers.generate`. La implementación recalcula el contexto y no está optimizada para inferencia. Con los pocos pasos de A/C las muestras pueden ser incoherentes: su propósito es verificar que el sampler termina.
 
 ## Instalación

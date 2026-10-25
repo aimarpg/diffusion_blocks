@@ -186,3 +186,13 @@ def test_compare_rejects_different_conditions() -> None:
     diff_cfg['datos']['sequence_length'] *= 2
     with pytest.raises(ValueError, match='datos'):
         compare(baseline, diffusion)
+
+
+def test_clamp_projects_to_codebook(config: dict) -> None:
+    """Con clamp, la predicción del sampler es exactamente un embedding del codebook."""
+    fijar_seed(config['experimento']['seed'])
+    model = construir_modelo(config)
+    prediction = torch.randn(1, 3, config['modelo']['hidden_size'])
+    clamped = model._clamp(prediction)
+    ids = torch.nn.functional.linear(prediction, model.embedding.weight).argmax(-1)
+    assert torch.equal(clamped, model.embedding.weight[ids])
