@@ -272,7 +272,8 @@ def run_probe(cfg: dict) -> dict:
             'sample': sample,
         }
         report['passed'] = all(counts) and reload_equal and (total_seconds < cfg['presupuesto']['total_seconds'])
-        if cfg['experimento']['prueba'] == 'B':
+        # B mide memorización (train); D mide generalización (validación con historias distintas).
+        if cfg['experimento']['prueba'] in ('B', 'D'):
             report['passed'] = report['passed'] and all(decreases)
         if cfg['experimento']['prueba'] == 'C':
             report['passed'] = report['passed'] and len(timings) >= tcfg['minimum_measured_steps'] and skipped == 0

@@ -38,6 +38,12 @@ python scripts/prepare_pilot.py --config configs/prepare_pilot.yaml
 python run.py --config configs/pilot_baseline.yaml
 python run.py --config configs/pilot_diffusion.yaml
 
+# D: aprendizaje y generalización en TinyStories (CUDA, ~10 min por test en RTX 2070)
+python scripts/prepare_pilot.py --config configs/prepare_learn.yaml
+python run.py --config configs/learn_baseline.yaml
+python run.py --config configs/learn_diffusion_noise_c.yaml        # ruido de C
+python run.py --config configs/learn_diffusion_noise_shifted.yaml  # ruido tuneado
+
 # Comparar recursos de las ejecuciones C
 python scripts/compare_pilot.py \
   --baseline runs/prueba_c_baseline/report.json \
