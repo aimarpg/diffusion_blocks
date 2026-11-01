@@ -62,3 +62,10 @@ piezas que ya existen.>
 - En curso: medición de viabilidad C pendiente de hardware CUDA/T4.
 - Pendiente: ejecutar C en T4, decidir embeddings/cabezas del experimento principal, evaluar calidad, fine-tuning y aplicativo.
 - Los módulos placeholder y sus tests se conservan por compatibilidad; run.py ejecuta src/training/probes.py.
+
+- Experimento E implementado: configs/full_*.yaml, 30 capas (3×10 en diffusion), codebook congelado, acumulación por tokens, LR warmup/coseno, checkpoints last/best y reanudación de RNG/orden de datos. Launcher: scripts/train_full.py; guía: docs/full_training.md.
+- E prepara 200k train + 2k validation + 2k test local reservado del split oficial validation. scripts/evaluate_full.py exporta métricas, continuaciones y plantilla de evaluación ciega; no usar test para ajustar hiperparámetros.
+- Verificado E en RTX 5000 Ada/PyTorch 2.5.1: las tres variantes ejecutan 6 actualizaciones FP16 con secuencia 256 y batch efectivo 16, sin pasos omitidos (fixture offline, no evidencia de calidad). Preset course: 900 s de entrenamiento; extended: 3600 s, fuera de la regla 5/20. Entrenamiento real E y C en T4 pendientes.
+- Verificación de implementación E (1-noviembre-2026): 26 tests pasan (incluye reanudación exacta CUDA FP16 y CPU), smoke A pasa y tiiac_check da 97/100. No se ha lanzado entrenamiento extenso E.
+- Preset dataset añadido: --budget dataset recorre epochs completas (por defecto 1) sin límite temporal ni techo fijo de pasos. Deriva pasos del cache y no repite el batch final. Cobertura por modelo; diffusion reparte batches entre bloques. 28 tests pasan, incluyendo cobertura exacta y reanudación en modo época.
+- Benchmark de microbatch: scripts/benchmark_batches.py compara 32/48 con acumulación 1 para las tres variantes; configs/batch_calibration.yaml declara candidatos. Procesos aislados, salidas separadas en runs/batch_calibration y tabla/comparison.json; no modifica configs de entrenamiento.

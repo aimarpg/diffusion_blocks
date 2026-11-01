@@ -1,0 +1,8 @@
+dataset_id: roneneldan/TinyStories
+dataset_revision: main
+tokenizer_id: HuggingFaceTB/SmolLM2-135M
+tokenizer_revision: main
+output: data/full_tokens
+train_stories: 200000
+validation_stories: 2000
+test_stories: 2000

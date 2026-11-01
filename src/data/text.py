@@ -48,7 +48,7 @@ def windows(stories: list[list[int]], length: int, pad: int) -> tuple[torch.Tens
     return torch.tensor(rows, dtype=torch.long), torch.tensor(masks, dtype=torch.bool)
 
 
-def load_text(cfg: dict) -> tuple[DataLoader, DataLoader, TextTokenizer, dict]:
+def load_text(cfg: dict, validation_split: str = 'validation') -> tuple[DataLoader, DataLoader, TextTokenizer, dict]:
     """Carga fixture o cache de TinyStories; verifica integridad y vocabulario."""
     data = cfg['datos']
     if data['source'] == 'fixture':
@@ -68,7 +68,7 @@ def load_text(cfg: dict) -> tuple[DataLoader, DataLoader, TextTokenizer, dict]:
             if hashlib.sha256((root / 'tokenizer' / name).read_bytes()).hexdigest() != digest:
                 raise ValueError(f'Hash incorrecto en tokenizer/{name}')
         groups = {}
-        for split in ('train', 'validation'):
+        for split in dict.fromkeys(('train', validation_split)):
             payload = (root / f'{split}.json').read_bytes()
             if hashlib.sha256(payload).hexdigest() != metadata['hashes'][split]:
                 raise ValueError(f'Hash incorrecto en {split}')
@@ -77,7 +77,7 @@ def load_text(cfg: dict) -> tuple[DataLoader, DataLoader, TextTokenizer, dict]:
     else:
         raise ValueError('source debe ser fixture o cache')
     loaders = []
-    for split in ('train', 'validation'):
+    for split in ('train', validation_split):
         if not 0 < data[f'{split}_stories'] <= len(groups[split]):
             raise ValueError(f'Número de historias inválido para {split}')
         stories = groups[split][:data[f'{split}_stories']]

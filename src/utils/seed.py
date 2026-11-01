@@ -49,3 +49,29 @@ def seed_temporal(seed: int) -> Iterator[None]:
     finally:
         random.setstate(python_state)
         np.random.set_state(numpy_state)
+
+
+def capturar_rng() -> dict:
+    """Captura RNG serializable con torch.load(weights_only=True)."""
+    state = np.random.get_state()
+    return {'python': random.getstate(),
+            'numpy': (state[0], state[1].tolist(), state[2], state[3], state[4]),
+            'torch': torch.get_rng_state(),
+            'cuda': torch.cuda.get_rng_state_all() if torch.cuda.is_available() else []}
+
+
+def restaurar_rng(state: dict) -> None:
+    """Restaura el RNG global después de construir modelo y optimizadores."""
+    random.setstate(state['python'])
+    ns = state['numpy']
+    np.random.set_state((ns[0], np.asarray(ns[1], dtype=np.uint32), *ns[2:]))
+    torch.set_rng_state(state['torch'].cpu())
+    if state['cuda']:
+        torch.cuda.set_rng_state_all([item.cpu() for item in state['cuda']])
+
+
+def generador_datos(seed: int) -> torch.Generator:
+    """Crea un RNG independiente para el orden de datos reproducible."""
+    generator = torch.Generator()
+    generator.manual_seed(seed)
+    return generator

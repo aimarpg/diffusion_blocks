@@ -1,0 +1,12 @@
+experiment_config: configs/full_experiment.yaml
+output: runs/batch_calibration
+profiles:
+  batch32:
+    batch_size: 32
+    gradient_accumulation_steps: 1
+  batch48:
+    batch_size: 48
+    gradient_accumulation_steps: 1
+  batch16:
+    batch_size: 16
+    gradient_accumulation_steps: 1

@@ -1,0 +1,44 @@
+configs:
+- configs/full_baseline.yaml
+- configs/full_diffusion_original.yaml
+- configs/full_diffusion_adjusted.yaml
+seeds:
+- 42
+- 43
+- 44
+calibration:
+  max_steps: 42
+  max_train_seconds: 240
+  eval_every: 0
+  max_batches: 2
+  checkpoint_every: 42
+budgets:
+  course:
+    max_train_seconds: 900
+    total_seconds: 1200
+  extended:
+    max_train_seconds: 3600
+    total_seconds: 4500
+  dataset:
+    max_train_seconds: null
+    total_seconds: null
+    epochs: 1
+verification:
+  datos:
+    source: fixture
+    path: tests/fixtures/stories.jsonl
+    train_stories: 8
+    validation_stories: 2
+    sequence_length: 256
+    batch_size: 2
+    pad_id: 0
+    eos_id: 1
+  entrenamiento:
+    max_steps: 6
+    gradient_accumulation_steps: 8
+    checkpoint_every: 3
+    max_train_seconds: 180
+    log_every: 3
+  evaluacion:
+    max_batches: 1
+    eval_every: 0
