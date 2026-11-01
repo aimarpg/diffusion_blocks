@@ -1,0 +1,6 @@
+# Release packaging only; checkpoints remain byte-for-byte identical.
+repository: aimarpg/diffusion_blocks
+tag: models-v1
+demo_config: configs/demo.yaml
+manifest: configs/model_assets.json
+output: runs/model_release

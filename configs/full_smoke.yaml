@@ -1,0 +1,76 @@
+experimento:
+  nombre: full_smoke
+  prueba: E
+  seed: 42
+modelo:
+  nombre: language
+  freeze_codebook: true
+  condition_frequency_base: 10000
+  method: diffusion
+  vocab_size: 258
+  hidden_size: 48
+  intermediate_size: 128
+  num_hidden_layers: 6
+  num_blocks: 3
+  num_attention_heads: 3
+  num_key_value_heads: 1
+  condition_dim: 8
+  rms_norm_eps: 1.0e-05
+  rope_theta: 100000
+  initializer_range: 0.041666666666666664
+  noise:
+    min: 0.002
+    max: 1.0
+    log_mean: -3.0
+    log_std: 1.2
+    sigma_data: 0.041666666666666664
+    logit_temperature: 0.01
+    steps_per_block: 2
+    clamp: true
+datos:
+  source: fixture
+  path: tests/fixtures/stories.jsonl
+  pad_id: 0
+  eos_id: 1
+  sequence_length: 32
+  batch_size: 2
+  num_workers: 0
+  train_stories: 8
+  validation_stories: 2
+entrenamiento:
+  device: cpu
+  precision: fp32
+  cpu_threads: 1
+  learning_rate: 0.003
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.95
+  gradient_clip: 1.0
+  max_steps: 12
+  max_train_seconds: 180
+  log_every: 3
+  gradient_accumulation_steps: 2
+  checkpoint_every: 3
+  lr_warmup_updates: 1
+  min_lr_ratio: 0.1
+  profile_warmup_steps: 12
+  initial_loss_scale: 1024
+evaluacion:
+  seed: 123
+  max_batches: 2
+  minimum_relative_drop: 0.0
+  eval_every: 3
+generacion:
+  prompt: 'Once '
+  max_new_tokens: 8
+  seed: 456
+presupuesto:
+  total_seconds: 300
+  reserve_fraction: 0.2
+salida:
+  directory: runs/full_smoke
+wandb:
+  proyecto: diffusion-blocks
+  entidad: trabajo-integrado
+  modo: offline

@@ -88,3 +88,56 @@ run.py                    Entrada única
 ```
 
 Uso de IA documentado en [AI_USAGE.md](AI_USAGE.md).
+
+## Experimento completo: tres variantes, 30 capas
+
+La guía de [entrenamiento completo](docs/full_training.md) documenta preparación,
+calibración GPU, entrenamiento reanudable, presupuestos y comparación de calidad.
+
+```bash
+python scripts/prepare_pilot.py --config configs/prepare_full.yaml
+python scripts/train_full.py --phase calibrate
+python scripts/train_full.py --phase train
+python scripts/evaluate_full.py --quick
+```
+
+Para una ejecución exploratoria de hasta una hora de entrenamiento por variante,
+fuera del presupuesto docente de 20 minutos, usar `--budget extended` tanto al
+entrenar como al evaluar. `--all-seeds` repite las tres semillas configuradas;
+`--resume` continúa los artefactos de la misma ejecución sin sobrescribirlos.
+
+Para recorrer **todo el dataset de 200k historias** por modelo, sin corte temporal:
+
+```bash
+python scripts/train_full.py --phase train --budget dataset
+python scripts/evaluate_full.py --budget dataset --quick
+```
+
+`budgets.dataset.epochs` configura las pasadas completas (por defecto una).
+El preset `extended` sigue limitado a una hora por variante y no garantiza una época.
+
+## Demo de generación en terminal
+
+Los checkpoints se distribuyen como adjuntos de la release `models-v1`, fuera de
+Git. Una vez publicada, descargar un modelo y su tokenizer con:
+
+```bash
+python scripts/download_models.py --models e-adjusted
+```
+
+Sin `--models` descarga los seis. La [guía de distribución](docs/model_release.md)
+explica preparación/publicación y verificación SHA-256. Las
+[comparaciones FP32 guardadas](reports/model_comparison/README.md) se incluyen
+como informes pequeños, sin pesos ni dataset.
+
+Generar con los checkpoints D/E existentes, sin entrenar ni descargar datos:
+
+```bash
+python demo.py                         # elegir modelo y escribir un inicio de historia
+python demo.py --list                  # ver modelos disponibles
+python demo.py --model d-adjusted e-adjusted --prompt "One day, Lily found a shiny key."
+```
+
+La [guía de la demo](docs/demo_cli.md) explica el uso interactivo, la comparación,
+las semillas, CPU/GPU y cómo guardar ejemplos. Las rutas y valores por defecto
+están en `configs/demo.yaml`.

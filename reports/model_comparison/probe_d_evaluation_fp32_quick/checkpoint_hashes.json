@@ -1,0 +1,5 @@
+{
+  "runs/Archive/prueba_d_baseline/checkpoint.pt": "ae6516b6f85c3ce22a2377c8ff577c7f004af2b8da340a5c377734030276f9cf",
+  "runs/Archive/prueba_d_diffusion_noise_c/checkpoint.pt": "d22a6b42445e25fb0a7de95bd8a419ca5591641e8dbd60ea4fa3e2c8fa5ebf35",
+  "runs/Archive/prueba_d_diffusion_noise_shifted/checkpoint.pt": "9b08ecc7afa0abf9026d9ccce3639b6bc310ed68266fae7adfcf88224d26b4d2"
+}

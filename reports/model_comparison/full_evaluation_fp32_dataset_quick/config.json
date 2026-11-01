@@ -1,0 +1,33 @@
+{
+  "device": "cuda",
+  "precision": "fp32",
+  "cpu_threads": 1,
+  "output": "runs/full_evaluation_fp32_dataset_quick",
+  "checkpoints": [
+    "runs/full_baseline_seed42_dataset/best.pt",
+    "runs/full_diffusion_original_seed42_dataset/best.pt",
+    "runs/full_diffusion_adjusted_seed42_dataset/best.pt"
+  ],
+  "data_path": "data/full_tokens",
+  "test_stories": 2000,
+  "max_batches": 16,
+  "batch_size": 2,
+  "prompt_count": 10,
+  "prompt_tokens": 16,
+  "max_new_tokens": 48,
+  "seeds": [
+    456
+  ],
+  "steps_per_block": 8,
+  "clamp": true,
+  "evaluation_seed": 123,
+  "experiment_config": "configs/full_experiment.yaml",
+  "quick": {
+    "prompt_count": 10,
+    "max_new_tokens": 48,
+    "max_batches": 16,
+    "seeds": [
+      456
+    ]
+  }
+}

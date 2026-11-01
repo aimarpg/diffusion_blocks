@@ -1,0 +1,78 @@
+{
+  "repository": "aimarpg/diffusion_blocks",
+  "tag": "models-v1",
+  "assets": [
+    {
+      "name": "d-baseline.pt",
+      "path": "runs/Archive/prueba_d_baseline/checkpoint.pt",
+      "size_bytes": 623165556,
+      "sha256": "ae6516b6f85c3ce22a2377c8ff577c7f004af2b8da340a5c377734030276f9cf",
+      "model": "d-baseline"
+    },
+    {
+      "name": "d-original.pt",
+      "path": "runs/Archive/prueba_d_diffusion_noise_c/checkpoint.pt",
+      "size_bytes": 672169420,
+      "sha256": "d22a6b42445e25fb0a7de95bd8a419ca5591641e8dbd60ea4fa3e2c8fa5ebf35",
+      "model": "d-original"
+    },
+    {
+      "name": "d-adjusted.pt",
+      "path": "runs/Archive/prueba_d_diffusion_noise_shifted/checkpoint.pt",
+      "size_bytes": 672169484,
+      "sha256": "9b08ecc7afa0abf9026d9ccce3639b6bc310ed68266fae7adfcf88224d26b4d2",
+      "model": "d-adjusted"
+    },
+    {
+      "name": "e-baseline.pt",
+      "path": "runs/full_baseline_seed42_dataset/best.pt",
+      "size_bytes": 1389959478,
+      "sha256": "0fa87393a870d8008e0382036779959af082ede6898476a8beb0b3dc82432b4b",
+      "model": "e-baseline"
+    },
+    {
+      "name": "e-original.pt",
+      "path": "runs/full_diffusion_original_seed42_dataset/best.pt",
+      "size_bytes": 1511402710,
+      "sha256": "d25b28bab43b917d59a7980891a3ccba88253ac4e4aec0e78e6739ca089f1026",
+      "model": "e-original"
+    },
+    {
+      "name": "e-adjusted.pt",
+      "path": "runs/full_diffusion_adjusted_seed42_dataset/best.pt",
+      "size_bytes": 1511402710,
+      "sha256": "363e5392adf7e397da03c7628443cfcd067ceb3341f51f7735938172e745899d",
+      "model": "e-adjusted"
+    },
+    {
+      "name": "tokenizer-merges.txt",
+      "path": "data/full_tokens/tokenizer/merges.txt",
+      "size_bytes": 466391,
+      "sha256": "0b54e8aa4e53d5383e2e4bc635a56b43f9647f7b13832d5d9ecd8f82dac4f510"
+    },
+    {
+      "name": "tokenizer-special_tokens_map.json",
+      "path": "data/full_tokens/tokenizer/special_tokens_map.json",
+      "size_bytes": 831,
+      "sha256": "e786b595b9a23148bf1630df78d9037a048ea671e48bfd3549a1e3c233742bb3"
+    },
+    {
+      "name": "tokenizer-tokenizer.json",
+      "path": "data/full_tokens/tokenizer/tokenizer.json",
+      "size_bytes": 3522656,
+      "sha256": "7d27c493c729a66ecefc837280b05d948b1ed50d130eebdbf911b1b36cf38ed7"
+    },
+    {
+      "name": "tokenizer-tokenizer_config.json",
+      "path": "data/full_tokens/tokenizer/tokenizer_config.json",
+      "size_bytes": 3658,
+      "sha256": "4bb9af56a342753d39374f4016a16574cab299fe088e896f425ce3c433f61424"
+    },
+    {
+      "name": "tokenizer-vocab.json",
+      "path": "data/full_tokens/tokenizer/vocab.json",
+      "size_bytes": 800662,
+      "sha256": "82b84012e3add4d01d12ba14442026e49b8cbbaead1f79ecf3d919784f82dc79"
+    }
+  ]
+}

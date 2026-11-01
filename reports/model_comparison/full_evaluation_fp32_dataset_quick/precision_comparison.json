@@ -1,0 +1,17 @@
+[
+  {
+    "model": "full_baseline_seed42_dataset",
+    "samples": 10,
+    "changed_token_sequences": 0
+  },
+  {
+    "model": "full_diffusion_adjusted_seed42_dataset",
+    "samples": 10,
+    "changed_token_sequences": 0
+  },
+  {
+    "model": "full_diffusion_original_seed42_dataset",
+    "samples": 10,
+    "changed_token_sequences": 1
+  }
+]

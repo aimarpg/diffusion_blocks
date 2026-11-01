@@ -16,6 +16,10 @@ def prepare(cfg: dict) -> None:
     from huggingface_hub import HfApi
     from transformers import AutoTokenizer
     root = Path(cfg['output'])
+    if root.is_absolute() or '..' in root.parts:
+        raise ValueError('Usar una salida relativa dentro del proyecto')
+    if cfg.get('test_stories', 0) < 0 or min(cfg['train_stories'], cfg['validation_stories']) < 1:
+        raise ValueError('Número de historias inválido')
     if (root / 'manifest.json').exists():
         raise FileExistsError('Ya existe un cache. Reutilizarlo o escoger otra salida en configs/.')
     root.mkdir(parents=True, exist_ok=True)
@@ -28,6 +32,7 @@ def prepare(cfg: dict) -> None:
     counts = {}
     seen = set()
     for split in ('train', 'validation'):
+        target = cfg[f'{split}_stories'] + (cfg.get('test_stories', 0) if split == 'validation' else 0)
         stream = load_dataset(cfg['dataset_id'], revision=dataset_sha, split=split, streaming=True)
         stories = []
         for row in stream:
@@ -39,15 +44,19 @@ def prepare(cfg: dict) -> None:
             ids = tokenizer.encode(text, add_special_tokens=False) + [tokenizer.eos_token_id]
             if len(ids) >= 2:
                 stories.append(ids)
-            if len(stories) == cfg[f'{split}_stories']:
+            if len(stories) == target:
                 break
-        if len(stories) != cfg[f'{split}_stories']:
+        if len(stories) != target:
             raise ValueError(f'No hay suficientes historias en {split}')
-        payload = json.dumps(stories).encode()
-        (root / f'{split}.json').write_bytes(payload)
-        hashes[split] = hashlib.sha256(payload).hexdigest()
-        counts[split] = len(stories)
-    manifest = {'dataset_id': cfg['dataset_id'], 'dataset_revision': dataset_sha, 'tokenizer_id': cfg['tokenizer_id'], 'tokenizer_revision': tokenizer_sha, 'vocab_size': len(tokenizer), 'eos_id': tokenizer.eos_token_id, 'hashes': hashes, 'tokenizer_hashes': {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in (root / 'tokenizer').iterdir() if path.is_file()}, 'counts': counts, 'selection': 'primeras historias únicas por split oficial, sin shuffle'}
+        partitions = {split: stories[:cfg[f'{split}_stories']]}
+        if split == 'validation' and cfg.get('test_stories', 0):
+            partitions['test'] = stories[cfg['validation_stories']:]
+        for name, partition in partitions.items():
+            payload = json.dumps(partition).encode()
+            (root / f'{name}.json').write_bytes(payload)
+            hashes[name] = hashlib.sha256(payload).hexdigest()
+            counts[name] = len(partition)
+    manifest = {'dataset_id': cfg['dataset_id'], 'dataset_revision': dataset_sha, 'tokenizer_id': cfg['tokenizer_id'], 'tokenizer_revision': tokenizer_sha, 'vocab_size': len(tokenizer), 'eos_id': tokenizer.eos_token_id, 'hashes': hashes, 'tokenizer_hashes': {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in (root / 'tokenizer').iterdir() if path.is_file()}, 'counts': counts, 'selection': 'primeras historias únicas por split oficial, sin shuffle; test es la continuación reservada de validation' if cfg.get('test_stories') else 'primeras historias únicas por split oficial, sin shuffle'}
     (root / 'manifest.json').write_text(json.dumps(manifest, indent=2))
     print(f'Preparado: {root}. Conservar manifest.json para reproducir las revisiones exactas.')
 

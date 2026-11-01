@@ -1,0 +1,45 @@
+[
+  {
+    "model": "prueba_d_baseline",
+    "checkpoint": "runs/Archive/prueba_d_baseline/checkpoint.pt",
+    "metrics": {
+      "loss_block_0": 2.8334500655986057,
+      "loss": 2.8334500655986057,
+      "perplexity": 17.004024742573463
+    },
+    "generation_count": 10,
+    "tokens_per_second": 86.33692928711174,
+    "mean_repetition_4gram": 0.01777777777777779,
+    "empty_fraction": 0.0
+  },
+  {
+    "model": "prueba_d_diffusion",
+    "checkpoint": "runs/Archive/prueba_d_diffusion_noise_c/checkpoint.pt",
+    "metrics": {
+      "loss_block_0": 0.7681090298467119,
+      "loss_block_1": 0.0,
+      "loss_block_2": 0.0,
+      "loss_sigma_max": 4.904883154112883,
+      "loss": 0.2560363432822373
+    },
+    "generation_count": 10,
+    "tokens_per_second": 8.109332968887312,
+    "mean_repetition_4gram": 0.0,
+    "empty_fraction": 0.0
+  },
+  {
+    "model": "prueba_d_diffusion_ruido",
+    "checkpoint": "runs/Archive/prueba_d_diffusion_noise_shifted/checkpoint.pt",
+    "metrics": {
+      "loss_block_0": 3.8287997270731355,
+      "loss_block_1": 2.217927002717578,
+      "loss_block_2": 0.5291998450476159,
+      "loss_sigma_max": 4.359017069033558,
+      "loss": 2.19197552494611
+    },
+    "generation_count": 10,
+    "tokens_per_second": 8.01407939152756,
+    "mean_repetition_4gram": 0.00888888888888889,
+    "empty_fraction": 0.0
+  }
+]
