@@ -29,6 +29,8 @@ El baseline genera por argmax. DiffusionBlocks genera un token cada vez: inicial
 
 `z_next = z + (sigma_next - sigma) * (z - D(z, sigma)) / sigma`
 
+Con `noise.clamp: true`, cada predicción `D` se sustituye por el embedding de su token más probable antes del paso de Euler (truco de *clamping* de Diffusion-LM, Li et al. 2022). Tras el último bloque se decodifica la predicción del denoiser en `sigma_min`, que equivale al paso final de EDM hasta `sigma=0`, y no el estado ruidoso. Sin ambas cosas la media posterior queda entre embeddings, la trayectoria conserva la dirección del ruido inicial (coseno 0,99) y el argmax final depende solo de la seed: dos modelos distintos generaban los mismos tokens aleatorios (ver D).
+
 Después proyecta al vocabulario y toma argmax. El prompt limpio permanece fijo. El número de pasos por bloque está en config; no se usa directamente `transformers.generate`. La implementación recalcula el contexto y no está optimizada para inferencia. Con los pocos pasos de A/C las muestras pueden ser incoherentes: su propósito es verificar que el sampler termina.
 
 ## Instalación
@@ -81,6 +83,43 @@ Usa la misma arquitectura y ocho historias, repitiendo el loader hasta 300 pasos
 Se evalúa antes y después sobre el mismo conjunto y realizaciones de ruido. La evaluación restaura el estado RNG, por lo que no altera el ruido ni el orden de entrenamiento. También se informa validación sobre historias distintas.
 
 Pasa si cada pérdida de entrenamiento por bloque desciende al menos un 2 %, además de los contratos de checkpoint y generación. El umbral es diagnóstico y vive en `evaluacion.minimum_relative_drop`; no equivale a convergencia. Un descenso solo en el bloque de menor ruido puede ser trivial: comprobar todos los bloques y la validación. No se calcula perplexity del denoiser.
+
+## D: aprendizaje y generalización en TinyStories
+
+B solo demuestra memorización y C solo mide recursos en 42 pasos. D comprueba si el modelo **aprende a generalizar** con datos reales:
+
+```bash
+python scripts/prepare_pilot.py --config configs/prepare_learn.yaml   # ~35 s, 50 000 + 500 historias
+python run.py --config configs/learn_baseline.yaml
+python run.py --config configs/learn_diffusion_noise_c.yaml
+python run.py --config configs/learn_diffusion_noise_shifted.yaml
+```
+
+Anchura SmolLM2 (576, 9 cabezas, 3 KV, MLP 1536, vocabulario 49152) para conservar el codebook y la geometría de ruido de C, pero 12 capas (tres bloques de cuatro). Secuencias de 256, batch 16, 3000 pasos (1000 por bloque), FP16, LR constante. Los 50 000 relatos dan ~11M tokens y 60 900 ventanas: los 3000 pasos no completan una época, así que nada se repite. Validación cada 300 pasos sobre 16 batches de historias distintas.
+
+Pasa si la pérdida de **validación** de cada bloque baja al menos un 5 %, además de los contratos de checkpoint y tiempo. Se informa también `loss_sigma_max`: la CE del bloque 0 con `sigma` fijo en el máximo, donde el token actual es casi irrecuperable del ruido. Aproxima (algo optimista) la CE de siguiente token y es la única pérdida diffusion comparable con el baseline.
+
+### Hallazgo: con el ruido de C, los bloques 1 y 2 no aprenden nada
+
+Con dimensión 576 y codebook aleatorio, un modelo **sin entrenar** recupera el token con 98 % de acierto para `sigma <= 0.15`: el camino identidad inicial (gates adaLN-Zero a cero y skip EDM) basta. Los intervalos de C (`[1, 0.083]`, `[0.083, 0.03]`, `[0.03, 0.002]`) se ajustaron con la dimensión 48 de A/B, donde el mismo `sigma` oculta mucho más. Resultado: los bloques 1 y 2 tienen pérdida exactamente 0 desde el paso 0, gradiente nulo, y la prueba falla. El ~89 % de las muestras del bloque 0 cae en `sigma < 0.4`, donde casi tampoco hay tarea.
+
+`learn_diffusion_noise_shifted.yaml` reubica la log-normal sobre la zona de transición (`min 0.1`, `max 5`, `log_mean -0.92`, `log_std 0.8`; fronteras `[5, 0.58, 0.30, 0.1]`). Es una propuesta para el experimento principal, no una decisión tomada.
+
+### Resultados (RTX 2070, PyTorch 2.5.1, 25-10-2026)
+
+| | pasa | val `loss_block_*` antes → después | CE siguiente token (val) | s entreno | pico VRAM |
+| --- | --- | --- | --- | --- | --- |
+| baseline | sí | 11.35 → 2.85 (ppl 17.2) | 2.85 | 573 | 5.0 GB |
+| diffusion, ruido C | no | 2.74→0.84 · 0→0 · 0→0 | 15.45 → 4.85 | 508 | 5.2 GB |
+| diffusion, ruido reubicado | sí | 15.0→3.80 · 9.75→2.27 · 1.93→0.47 | 18.43 → 4.31 | 507 | 5.2 GB |
+
+Muestras (prompt `Once upon a time, there was a little`, 48 tokens, argmax):
+
+- baseline: *girl named Lily. She loved to play outside in the sunshine. One day, she found a shiny rock on the ground. She picked it up and showed it to her mom.*
+- diffusion, ruido reubicado: *girl named Lily. She loved to play outside with her friends. One day, Lily went to eat the hill. She saw a big Carpenter in the park.*
+- diffusion, ruido C: *girl named Johnson. She loved opposites playing and watchful to see it in a big Ground. weddings they were revenge.*
+
+Lectura: diffusion aprende lenguaje con actualizaciones independientes por bloque, pero con el mismo número de pasos queda detrás del baseline (4.31 frente a 2.85 de CE aproximada). Cada paso diffusion actualiza 4 capas y el baseline 12. El ruido reubicado mejora tanto la pérdida como la muestra. La RTX 2070 es de la misma generación (Turing) que la T4 pero más rápida: en T4 cada proceso debería seguir dentro de 20 min, aunque falta medirlo.
 
 ## C: piloto de arquitectura completa en CUDA/T4
 

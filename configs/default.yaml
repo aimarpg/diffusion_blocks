@@ -27,6 +27,7 @@ modelo:
     sigma_data: 0.041666666666666664
     logit_temperature: 0.01
     steps_per_block: 2
+    clamp: true
 datos:
   source: cache
   path: data/pilot_tokens
@@ -55,6 +56,7 @@ evaluacion:
   seed: 123
   max_batches: 2
   minimum_relative_drop: 0.0
+  eval_every: 0
 generacion:
   prompt: 'Once '
   max_new_tokens: 8

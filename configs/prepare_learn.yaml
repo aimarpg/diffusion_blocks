@@ -1,0 +1,8 @@
+# D: subset mayor de TinyStories para medir generalización, no memorización.
+dataset_id: roneneldan/TinyStories
+dataset_revision: main
+tokenizer_id: HuggingFaceTB/SmolLM2-135M
+tokenizer_revision: main
+output: data/learn_tokens
+train_stories: 50000
+validation_stories: 500

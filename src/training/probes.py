@@ -20,11 +20,12 @@ from src.utils.seed import fijar_seed, seed_temporal
 from src.utils.tracking import abrir_run, registrar
 
 
-def loss_for(model: LanguageModel, tokens: torch.Tensor, valid: torch.Tensor, block: int, cfg: dict) -> tuple[torch.Tensor, int]:
+def loss_for(model: LanguageModel, tokens: torch.Tensor, valid: torch.Tensor, block: int, cfg: dict, sigma: float | None = None) -> tuple[torch.Tensor, int]:
     """Calcula CE sobre tokens válidos; baseline desplaza labels, denoising no."""
     if model.diffusion:
         inputs, labels, mask = tokens[:, :-1], tokens[:, :-1], valid[:, :-1]
-        logits = model(inputs, block=block)
+        fixed = None if sigma is None else torch.full((inputs.size(0),), sigma, device=inputs.device)
+        logits = model(inputs, block=block, sigma=fixed)
     else:
         inputs, labels, mask = tokens[:, :-1], tokens[:, 1:], valid[:, 1:]
         logits = model(inputs)
@@ -42,19 +43,25 @@ def evaluate(model: LanguageModel, loader: DataLoader, cfg: dict, device: torch.
     was_training = model.training
     model.eval()
     result = {}
+    # En sigma máximo el token actual es casi irrecuperable del ruido: la CE del bloque 0
+    # aproxima (algo optimista) la CE de siguiente token y se compara con el baseline.
+    passes = [(f'loss_block_{block}', block, None) for block in range(len(model.blocks))]
+    if model.diffusion:
+        passes.append(('loss_sigma_max', 0, float(model.boundaries[0])))
     with seed_temporal(cfg['evaluacion']['seed']):
-        for block in range(len(model.blocks)):
+        for key, block, sigma in passes:
             total, count = 0.0, 0
             for index, (tokens, valid) in enumerate(loader):
                 if index >= cfg['evaluacion']['max_batches']:
                     break
-                loss, n = loss_for(model, tokens.to(device), valid.to(device), block, cfg)
+                loss, n = loss_for(model, tokens.to(device), valid.to(device), block, cfg, sigma)
                 total += float(loss) * n
                 count += n
             if not count:
                 raise ValueError('Evaluación sin tokens')
-            result[f'loss_block_{block}'] = total / count
-    result['loss'] = sum(result.values()) / len(result)
+            result[key] = total / count
+    blocks = [result[f'loss_block_{block}'] for block in range(len(model.blocks))]
+    result['loss'] = sum(blocks) / len(blocks)
     if not model.diffusion:
         result['perplexity'] = math.exp(result['loss'])
     model.train(was_training)
@@ -86,7 +93,7 @@ def run_probe(cfg: dict) -> dict:
             raise RuntimeError('La prueba C requiere CUDA. Ejecutarla en Colab/T4; no se sustituye por CPU.')
         if tcfg['precision'] not in ('fp32', 'fp16') or (tcfg['precision'] == 'fp16' and device.type != 'cuda'):
             raise ValueError('FP16 requiere CUDA; CPU usa fp32')
-        if not 0 <= tcfg['warmup_steps'] < tcfg['max_steps'] or tcfg['log_every'] < 1:
+        if not 0 <= tcfg['warmup_steps'] < tcfg['max_steps'] or tcfg['log_every'] < 1 or cfg['evaluacion']['eval_every'] < 0:
             raise ValueError('Calentamiento o número de pasos inválido')
         if not 0 <= cfg['presupuesto']['reserve_fraction'] < 1:
             raise ValueError('La reserva debe estar entre 0 y 1')
@@ -104,7 +111,7 @@ def run_probe(cfg: dict) -> dict:
         counts = [0] * len(groups)
         token_counts = [0] * len(groups)
         skipped = 0
-        timings, measured_tokens, history = [], 0, []
+        timings, measured_tokens, history, curve = [], 0, [], []
         iterator = iter(train)
         peak_allocated = peak_reserved = 0
         training_start = time.perf_counter()
@@ -161,6 +168,12 @@ def run_probe(cfg: dict) -> dict:
                             for key, value in row.items()}, step + 1)
             if (step + 1) % tcfg['log_every'] == 0:
                 print(f"paso {step + 1}/{tcfg['max_steps']} bloque={block} loss={row['loss']:.4f} s={elapsed:.3f}", flush=True)
+            # Curva de validación fuera del tiempo por paso; sí cuenta para max_train_seconds.
+            if cfg['evaluacion']['eval_every'] and (step + 1) % cfg['evaluacion']['eval_every'] == 0:
+                point = evaluate(model, validation, cfg, device)
+                curve.append({'step': step + 1, **point})
+                registrar(run, {f'validation/{key}': value for key, value in point.items()}, step + 1)
+                print(f"eval paso {step + 1}: " + ' '.join(f'{key}={value:.4f}' for key, value in point.items()), flush=True)
         _sync(device)
         training_seconds = time.perf_counter() - training_start
         if device.type == 'cuda':
@@ -239,6 +252,7 @@ def run_probe(cfg: dict) -> dict:
             'final': after_train,
             'validation_before': before_validation,
             'validation_after': after_validation,
+            'validation_curve': curve,
             'updates_per_block': counts,
             'tokens_per_block': token_counts,
             'skipped_updates': skipped,
@@ -258,7 +272,8 @@ def run_probe(cfg: dict) -> dict:
             'sample': sample,
         }
         report['passed'] = all(counts) and reload_equal and (total_seconds < cfg['presupuesto']['total_seconds'])
-        if cfg['experimento']['prueba'] == 'B':
+        # B mide memorización (train); D mide generalización (validación con historias distintas).
+        if cfg['experimento']['prueba'] in ('B', 'D'):
             report['passed'] = report['passed'] and all(decreases)
         if cfg['experimento']['prueba'] == 'C':
             report['passed'] = report['passed'] and len(timings) >= tcfg['minimum_measured_steps'] and skipped == 0

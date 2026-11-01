@@ -1,0 +1,73 @@
+# D (variante): ruido reubicado sobre la zona de transición del codebook d=576.
+# Con el ruido de C, sigma<0.15 recupera el token sin entrenar (bloques 1-2 triviales).
+experimento:
+  nombre: prueba_d_diffusion_noise_shifted
+  prueba: D
+  seed: 42
+modelo:
+  nombre: language
+  freeze_codebook: true
+  condition_frequency_base: 10000
+  method: diffusion
+  vocab_size: 49152
+  hidden_size: 576
+  intermediate_size: 1536
+  num_hidden_layers: 12
+  num_blocks: 3
+  num_attention_heads: 9
+  num_key_value_heads: 3
+  condition_dim: 96
+  rms_norm_eps: 0.00001
+  rope_theta: 100000
+  initializer_range: 0.041666666666666664
+  noise:
+    min: 0.1
+    max: 5.0
+    log_mean: -0.92
+    log_std: 0.8
+    sigma_data: 0.041666666666666664
+    logit_temperature: 0.01
+    steps_per_block: 8
+    clamp: true
+datos:
+  source: cache
+  path: data/learn_tokens
+  tokenizer_id: HuggingFaceTB/SmolLM2-135M
+  pad_id: 0
+  eos_id: 0
+  sequence_length: 256
+  batch_size: 16
+  num_workers: 0
+  train_stories: 50000
+  validation_stories: 500
+entrenamiento:
+  device: cuda
+  precision: fp16
+  cpu_threads: 1
+  learning_rate: 0.0006
+  weight_decay: 0.01
+  betas: [0.9, 0.95]
+  gradient_clip: 1.0
+  max_steps: 3000
+  warmup_steps: 30
+  minimum_measured_steps: 30
+  max_train_seconds: 900
+  log_every: 100
+evaluacion:
+  seed: 123
+  max_batches: 16
+  minimum_relative_drop: 0.05
+  eval_every: 300
+generacion:
+  prompt: 'Once upon a time, there was a little'
+  max_new_tokens: 48
+  seed: 456
+presupuesto:
+  total_seconds: 1200
+  reserve_fraction: 0.2
+salida:
+  directory: runs/prueba_d_diffusion_noise_shifted
+wandb:
+  proyecto: diffusion-blocks
+  entidad: trabajo-integrado
+  modo: offline

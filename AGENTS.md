@@ -57,6 +57,8 @@ piezas que ya existen.>
 
 - Hecho: pruebas A/B/C configurables, Transformer con GQA/RoPE, denoising independiente, sampler, cache de texto y documentación. A/B usan fixture offline; C usa TinyStories y tokenizer oficial.
 - Verificado en CPU Mac Intel/PyTorch 2.2.2: A/B pasan, 18 tests pasan y tiiac_check da 95/100. Codebook congelado en ambos pilotos; no importar aún pesos oficiales.
+- Prueba D (configs/learn_*.yaml, 50k historias): baseline y diffusion con ruido reubicado pasan en RTX 2070. Con el ruido de C los bloques 1-2 tienen pérdida 0 desde el inicio (d=576): no reutilizar esos intervalos sin revisarlos.
+- Sampler diffusion: clamping (`noise.clamp`) y decodificación de la predicción final; sin ello generaba ruido.
 - En curso: medición de viabilidad C pendiente de hardware CUDA/T4.
 - Pendiente: ejecutar C en T4, decidir embeddings/cabezas del experimento principal, evaluar calidad, fine-tuning y aplicativo.
 - Los módulos placeholder y sus tests se conservan por compatibilidad; run.py ejecuta src/training/probes.py.
