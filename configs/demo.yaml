@@ -1,0 +1,46 @@
+# Local generation only. Run commands from the repository root.
+device: auto
+precision: fp32
+cpu_threads: 1
+tokenizer_path: data/full_tokens/tokenizer
+default_model: e-adjusted
+generation:
+  seed: 456
+  max_new_tokens: 48
+  max_total_tokens: 256
+  steps_per_block: 8
+  clamp: true
+groups:
+  D: 'Probe D / 12 layers / 50k stories'
+  E: 'Probe E / 30 layers / 200k stories'
+models:
+  d-baseline:
+    group: D
+    label: Autoregressive baseline
+    description: 'D baseline: 12 layers, trained on 50k stories'
+    checkpoint: runs/Archive/prueba_d_baseline/checkpoint.pt
+  d-original:
+    group: D
+    label: Diffusion / original noise
+    description: 'D diffusion, original noise: 12 layers, 50k stories'
+    checkpoint: runs/Archive/prueba_d_diffusion_noise_c/checkpoint.pt
+  d-adjusted:
+    group: D
+    label: Diffusion / adjusted noise
+    description: 'D diffusion, adjusted noise: 12 layers, 50k stories'
+    checkpoint: runs/Archive/prueba_d_diffusion_noise_shifted/checkpoint.pt
+  e-baseline:
+    group: E
+    label: Autoregressive baseline
+    description: 'E baseline: 30 layers, trained on 200k stories'
+    checkpoint: runs/full_baseline_seed42_dataset/best.pt
+  e-original:
+    group: E
+    label: Diffusion / original noise
+    description: 'E diffusion, original noise: 30 layers, 200k stories'
+    checkpoint: runs/full_diffusion_original_seed42_dataset/best.pt
+  e-adjusted:
+    group: E
+    label: Diffusion / adjusted noise
+    description: 'E diffusion, adjusted noise: 30 layers, 200k stories'
+    checkpoint: runs/full_diffusion_adjusted_seed42_dataset/best.pt

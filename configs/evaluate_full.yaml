@@ -1,7 +1,7 @@
 device: cuda
-precision: fp16
+precision: fp32
 cpu_threads: 1
-output: runs/full_evaluation
+output: runs/full_evaluation_fp32
 checkpoints:
 - runs/full_baseline_seed42/best.pt
 - runs/full_diffusion_original_seed42/best.pt

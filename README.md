@@ -115,3 +115,17 @@ python scripts/evaluate_full.py --budget dataset --quick
 
 `budgets.dataset.epochs` configura las pasadas completas (por defecto una).
 El preset `extended` sigue limitado a una hora por variante y no garantiza una época.
+
+## Demo de generación en terminal
+
+Generar con los checkpoints D/E existentes, sin entrenar ni descargar datos:
+
+```bash
+python demo.py                         # elegir modelo y escribir un inicio de historia
+python demo.py --list                  # ver modelos disponibles
+python demo.py --model d-adjusted e-adjusted --prompt "One day, Lily found a shiny key."
+```
+
+La [guía de la demo](docs/demo_cli.md) explica el uso interactivo, la comparación,
+las semillas, CPU/GPU y cómo guardar ejemplos. Las rutas y valores por defecto
+están en `configs/demo.yaml`.

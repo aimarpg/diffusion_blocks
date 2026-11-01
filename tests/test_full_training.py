@@ -189,3 +189,28 @@ def test_dataset_epoch_covers_every_window_once(method: str, tmp_path: Path, mon
     actual = torch.load('resumed_epoch/last.pt', weights_only=True)
     for name, value in expected['model'].items():
         assert torch.equal(value, actual['model'][name])
+
+
+@pytest.mark.parametrize('change', ['none', 'tokenizer', 'train', 'overlap'])
+def test_external_test_cache_validation(tmp_path: Path, change: str) -> None:
+    """El test externo exige tokenizer idéntico, train verificable y ausencia de solapamiento."""
+    import hashlib
+    from scripts.evaluate_full import validate_external_test_cache
+
+    stories = [[2, 3, 1], [4, 5, 1]]
+    (tmp_path / 'train.json').write_text(json.dumps(stories))
+    (tmp_path / 'test.json').write_text(json.dumps([stories[0]] if change == 'overlap' else [[6, 7, 1]]))
+    metadata = dict(dataset_id='fixture', dataset_revision='dataset-sha', tokenizer_id='fixture',
+                    tokenizer_revision='tokenizer-sha', vocab_size=258, eos_id=1,
+                    tokenizer_hashes={'tokenizer.json': 'hash'}, counts={'train': 1},
+                    hashes={'train': hashlib.sha256(json.dumps(stories[:1]).encode()).hexdigest()})
+    evaluation = copy.deepcopy(metadata)
+    if change == 'tokenizer':
+        evaluation['tokenizer_revision'] = 'other'
+    if change == 'train':
+        metadata['hashes']['train'] = 'wrong'
+    if change == 'none':
+        validate_external_test_cache(metadata, evaluation, tmp_path)
+    else:
+        with pytest.raises(ValueError):
+            validate_external_test_cache(metadata, evaluation, tmp_path)

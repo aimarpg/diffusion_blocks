@@ -30,6 +30,22 @@ def repetition(ids: list[int], n: int) -> float:
     return 1 - len(set(grams)) / len(grams) if grams else 0.0
 
 
+def validate_external_test_cache(training: dict, evaluation: dict, root: Path) -> None:
+    """Verifica tokenizer, procedencia, subset de train y ausencia de solapamiento con test."""
+    identity = ('dataset_id', 'dataset_revision', 'tokenizer_id', 'tokenizer_revision',
+                'vocab_size', 'eos_id', 'tokenizer_hashes')
+    if any(training[key] != evaluation[key] for key in identity):
+        raise ValueError('El cache externo tiene dataset o tokenizer incompatible')
+    stories = json.loads((root / 'train.json').read_text())[:training['counts']['train']]
+    digest = hashlib.sha256(json.dumps(stories).encode()).hexdigest()
+    if digest != training['hashes']['train']:
+        raise ValueError('No se puede verificar el subset de entrenamiento original')
+    train_ids = {tuple(story) for story in stories}
+    test = json.loads((root / 'test.json').read_text())
+    if any(tuple(story) in train_ids for story in test):
+        raise ValueError('El test externo contiene historias de entrenamiento')
+
+
 def run_evaluation(settings: dict, resume: bool = False) -> None:
     """Mantiene los mismos prompts, seeds y sampler en todos los checkpoints."""
     output = relative_path(settings['output'])
@@ -92,7 +108,9 @@ def run_evaluation(settings: dict, resume: bool = False) -> None:
         cfg['evaluacion'].update(seed=settings['evaluation_seed'], max_batches=settings['max_batches'])
         cfg['modelo']['noise'].update(steps_per_block=settings['steps_per_block'], clamp=settings['clamp'])
         _, loader, tokenizer, metadata = load_text(cfg, validation_split='test')
-        if metadata != saved['metadata']:
+        if settings.get('external_test_cache', False):
+            validate_external_test_cache(saved['metadata'], metadata, relative_path(settings['data_path']))
+        elif metadata != saved['metadata']:
             raise ValueError('El cache de evaluación no coincide con el de entrenamiento')
         cfg['evaluacion']['max_batches'] = settings['max_batches'] or len(loader)
         if prompts is None:

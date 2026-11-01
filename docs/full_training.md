@@ -206,7 +206,7 @@ weights. Full diffusion evaluation can take substantially longer than training:
 there is no KV cache and each token requires multiple denoiser passes. Evaluation
 has its own budget and is outside the training budget.
 
-Default outputs are in `runs/full_evaluation/`, with `_extended`, `_all_seeds` and
+Default FP32 outputs are in `runs/full_evaluation_fp32/`, with `_extended`, `_all_seeds` and
 `_quick` suffixes when selected:
 
 | Artifact | Content |
@@ -342,3 +342,71 @@ repeated resumes. After selecting a batch that fits and performs well across all
 three models, set its `datos.batch_size` and
 `entrenamiento.gradient_accumulation_steps: 1` in all three main model configs
 before starting full training. The benchmark does not change these settings.
+
+
+## Generation precision correction
+
+The full evaluator initially enabled FP16 autocast for generation. Probe D's
+sampler ran in FP32, so this introduced an unnecessary evaluation difference.
+`configs/evaluate_full.yaml` now uses `precision: fp32` and the separate output
+root `runs/full_evaluation_fp32`. Training precision and checkpoints are unchanged;
+held-out loss evaluation already used FP32. Prior FP16 settings are retained in
+`configs/evaluate_full_fp16.yaml`, and existing evaluation artifacts are preserved.
+
+```bash
+python scripts/evaluate_full.py --budget dataset --quick
+```
+
+The rerun uses the same checkpoints, prompts, seeds, noise intervals and sampler
+steps. Its outputs are under `runs/full_evaluation_fp32_dataset_quick/`. This
+isolates generation precision; it does not by itself establish that precision
+caused differences in perceived quality. FP32 matches D's arithmetic setting but
+does not match D's different prompt set or smaller trained architecture.
+
+The FP32 quick rerun completed all 30 generations with identical checkpoint
+hashes, prompts and other evaluation settings. Exact generated-token comparison:
+baseline 10/10 unchanged; adjusted diffusion 10/10 unchanged; original diffusion
+9/10 unchanged (prompt_id 8 changed). Results are in
+`runs/full_evaluation_fp32_dataset_quick/precision_comparison.json`. This check
+isolates arithmetic precision for these samples; it is not a general assessment
+of precision effects or a comparison against D checkpoints.
+
+## Reevaluate uploaded probe D checkpoints on E's reserved test
+
+```bash
+python scripts/evaluate_full.py --config configs/evaluate_probe_d.yaml --quick
+```
+
+This configuration reads the three original 12-layer checkpoints from
+`runs/Archive/` and writes separate artifacts to
+`runs/probe_d_evaluation_fp32_quick/`. It preserves their training configuration
+and uses E's FP32 quick evaluation: identical test cache, ten 16-token prefixes,
+48 continuation tokens, seed 456, sixteen batches of two sequences, and eight
+Euler steps per diffusion block with clamping. Use `--resume` after interruption.
+
+The explicit `external_test_cache` option leaves normal cache-equality checks
+unchanged by default. For external evaluation it instead requires matching dataset
+and tokenizer revisions, token IDs and tokenizer file hashes. It reconstructs
+the checkpoint's training subset from the evaluation cache's training prefix,
+checks its original SHA256, and rejects train/test story overlap. The regular
+loader still validates cache file hashes. This option is intentionally limited
+to training subsets that can be verified as prefixes of the shared cache.
+
+Compare with `runs/full_evaluation_fp32_dataset_quick/`, rather than the earlier
+FP16 generation artifacts. D's uploaded artifacts are final checkpoints; E's
+artifacts use best-validation checkpoints. D and E differ in depth (12 versus
+30 layers), training stories (50k versus 200k), updates, batch size and LR schedule.
+Their comparison does not isolate the effect of dataset size. Quick evaluation
+is a preview, and denoising CE is not language-model perplexity. Generation speed
+from separate runs is descriptive, not a controlled inference benchmark.
+
+The completed quick comparison is exported to
+`runs/probe_d_vs_full_dataset_quick/comparison.json` and `comparison.csv`.
+`matched_generations.csv` pairs all six models on each prompt. Exact evaluation
+settings and prompt IDs were checked against the existing E FP32 results before
+combining them; E was not rerun. D baseline CE is 2.83345 (perplexity 17.004),
+versus E CE 1.83563 (perplexity 6.269). Original-noise `loss_sigma_max` is
+4.90488 versus 3.62724; adjusted-noise is 4.35902 versus 3.17702. All 30 D
+continuations completed, and all 32 project tests pass. Generated text still
+requires human assessment. Timing values are descriptive: evaluations ran
+separately, and tests briefly shared the GPU during D evaluation.
