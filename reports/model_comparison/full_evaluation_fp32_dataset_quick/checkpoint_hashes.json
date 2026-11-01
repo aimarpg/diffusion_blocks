@@ -1,0 +1,5 @@
+{
+  "runs/full_baseline_seed42_dataset/best.pt": "0fa87393a870d8008e0382036779959af082ede6898476a8beb0b3dc82432b4b",
+  "runs/full_diffusion_original_seed42_dataset/best.pt": "d25b28bab43b917d59a7980891a3ccba88253ac4e4aec0e78e6739ca089f1026",
+  "runs/full_diffusion_adjusted_seed42_dataset/best.pt": "363e5392adf7e397da03c7628443cfcd067ceb3341f51f7735938172e745899d"
+}

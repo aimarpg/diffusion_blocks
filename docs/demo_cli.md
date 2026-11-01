@@ -15,10 +15,19 @@ Activate the project's Python environment:
 source .venv/bin/activate
 ```
 
-The checkpoints and local tokenizer must already be present. This workspace has
-them. The demo does not download files or require W&B, internet access, or the
-training stories. If using another computer, copy the checkpoints and the
-`data/full_tokens/tokenizer/` folder too, and install `requirements.txt`.
+Install `requirements.txt`, then download the models and matching tokenizer once
+from the published `models-v1` release:
+
+```bash
+python scripts/download_models.py --models e-adjusted
+```
+
+Omit `--models` to download all six, or list several aliases to choose a subset.
+Files already present with matching checksums are skipped. See
+[model_release.md](model_release.md) for release availability and publishing.
+After downloading, the demo runs locally without W&B, internet access or the
+training stories. You can also copy the checkpoints and matching
+`data/full_tokens/tokenizer/` folder from an existing workspace.
 
 ## Easiest option: interactive demo
 
@@ -78,8 +87,9 @@ The `NO_COLOR` environment variable also disables colour and animations.
 python demo.py --list
 ```
 
-`ready` means the checkpoint file exists; `missing` means it must be copied to
-the listed location, or its location must be updated in `configs/demo.yaml`.
+`ready` means the checkpoint file exists; `missing` means it must be downloaded
+with `scripts/download_models.py`, copied to the listed location, or its location
+must be updated in `configs/demo.yaml`.
 
 | Name | Experiment | Model |
 | --- | --- | --- |

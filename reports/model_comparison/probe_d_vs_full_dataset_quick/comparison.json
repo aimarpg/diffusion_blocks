@@ -1,0 +1,113 @@
+{
+  "settings": {
+    "device": "cuda",
+    "precision": "fp32",
+    "data_path": "data/full_tokens",
+    "test_stories": 2000,
+    "max_batches": 16,
+    "batch_size": 2,
+    "prompt_count": 10,
+    "prompt_tokens": 16,
+    "max_new_tokens": 48,
+    "seeds": [
+      456
+    ],
+    "steps_per_block": 8,
+    "clamp": true,
+    "evaluation_seed": 123
+  },
+  "sources": {
+    "D": "runs/probe_d_evaluation_fp32_quick",
+    "E": "runs/full_evaluation_fp32_dataset_quick"
+  },
+  "checks": {
+    "identical_evaluation_settings": true,
+    "identical_prompt_ids": true
+  },
+  "limitations": [
+    "One training seed and ten prompts per model; limited test batches.",
+    "D: 12 layers/50k training stories/final checkpoint; E: 30 layers/200k stories/best checkpoint.",
+    "Batch size, update count and learning-rate schedule also differ.",
+    "Diffusion loss_sigma_max is a denoising diagnostic, not next-token likelihood or perplexity.",
+    "Generation timings are from separate runs; unit tests briefly shared the GPU during D evaluation."
+  ],
+  "comparison": [
+    {
+      "variant": "baseline",
+      "metric": "next_token_ce",
+      "D": 2.8334500655986057,
+      "E": 1.8356327637705643,
+      "relative_reduction_percent": 35.21563037029342,
+      "D_perplexity": 17.004024742573463,
+      "E_perplexity": 6.2690997498537575,
+      "D_block_losses": [
+        2.8334500655986057
+      ],
+      "E_block_losses": [
+        1.8356327637705643
+      ],
+      "D_repetition_4gram": 0.01777777777777779,
+      "E_repetition_4gram": 0.028888888888888898,
+      "D_empty_fraction": 0.0,
+      "E_empty_fraction": 0.0,
+      "D_tokens_per_second": 86.33692928711174,
+      "E_tokens_per_second": 35.691927748870384,
+      "D_checkpoint": "runs/Archive/prueba_d_baseline/checkpoint.pt",
+      "E_checkpoint": "runs/full_baseline_seed42_dataset/best.pt"
+    },
+    {
+      "variant": "diffusion_original",
+      "metric": "loss_sigma_max",
+      "D": 4.904883154112883,
+      "E": 3.627242185078658,
+      "relative_reduction_percent": 26.0483466963507,
+      "D_perplexity": null,
+      "E_perplexity": null,
+      "D_block_losses": [
+        0.7681090298467119,
+        0.0,
+        0.0
+      ],
+      "E_block_losses": [
+        0.5559756728628042,
+        0.0,
+        0.0
+      ],
+      "D_repetition_4gram": 0.0,
+      "E_repetition_4gram": 0.0,
+      "D_empty_fraction": 0.0,
+      "E_empty_fraction": 0.0,
+      "D_tokens_per_second": 8.109332968887312,
+      "E_tokens_per_second": 3.559887465533566,
+      "D_checkpoint": "runs/Archive/prueba_d_diffusion_noise_c/checkpoint.pt",
+      "E_checkpoint": "runs/full_diffusion_original_seed42_dataset/best.pt"
+    },
+    {
+      "variant": "diffusion_adjusted",
+      "metric": "loss_sigma_max",
+      "D": 4.359017069033558,
+      "E": 3.1770178089496204,
+      "relative_reduction_percent": 27.116187924127583,
+      "D_perplexity": null,
+      "E_perplexity": null,
+      "D_block_losses": [
+        3.8287997270731355,
+        2.217927002717578,
+        0.5291998450476159
+      ],
+      "E_block_losses": [
+        2.7580708643746754,
+        1.5389253180608433,
+        0.36895395415637866
+      ],
+      "D_repetition_4gram": 0.00888888888888889,
+      "E_repetition_4gram": 0.008888888888888901,
+      "D_empty_fraction": 0.0,
+      "E_empty_fraction": 0.0,
+      "D_tokens_per_second": 8.01407939152756,
+      "E_tokens_per_second": 3.5462607494480185,
+      "D_checkpoint": "runs/Archive/prueba_d_diffusion_noise_shifted/checkpoint.pt",
+      "E_checkpoint": "runs/full_diffusion_adjusted_seed42_dataset/best.pt"
+    }
+  ]
+}

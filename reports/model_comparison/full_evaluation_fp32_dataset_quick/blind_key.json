@@ -1,0 +1,182 @@
+[
+  {
+    "id": "e8f219e4468d56b5",
+    "model": "full_baseline_seed42_dataset",
+    "prompt_id": 0,
+    "seed": 456
+  },
+  {
+    "id": "623bb10a612ced40",
+    "model": "full_baseline_seed42_dataset",
+    "prompt_id": 1,
+    "seed": 456
+  },
+  {
+    "id": "8a716f7c1bd4bb9b",
+    "model": "full_baseline_seed42_dataset",
+    "prompt_id": 2,
+    "seed": 456
+  },
+  {
+    "id": "fddc8eab56e4c9be",
+    "model": "full_baseline_seed42_dataset",
+    "prompt_id": 3,
+    "seed": 456
+  },
+  {
+    "id": "2beaec8d5609fd3f",
+    "model": "full_baseline_seed42_dataset",
+    "prompt_id": 4,
+    "seed": 456
+  },
+  {
+    "id": "2b57166b8f934acb",
+    "model": "full_baseline_seed42_dataset",
+    "prompt_id": 5,
+    "seed": 456
+  },
+  {
+    "id": "07f805f9d269ae6b",
+    "model": "full_baseline_seed42_dataset",
+    "prompt_id": 6,
+    "seed": 456
+  },
+  {
+    "id": "90e966a38f2badf5",
+    "model": "full_baseline_seed42_dataset",
+    "prompt_id": 7,
+    "seed": 456
+  },
+  {
+    "id": "abf22f91eab69fb8",
+    "model": "full_baseline_seed42_dataset",
+    "prompt_id": 8,
+    "seed": 456
+  },
+  {
+    "id": "2182e8219649210a",
+    "model": "full_baseline_seed42_dataset",
+    "prompt_id": 9,
+    "seed": 456
+  },
+  {
+    "id": "4ed9cc149759476d",
+    "model": "full_diffusion_original_seed42_dataset",
+    "prompt_id": 0,
+    "seed": 456
+  },
+  {
+    "id": "a1419ed4fe0af693",
+    "model": "full_diffusion_original_seed42_dataset",
+    "prompt_id": 1,
+    "seed": 456
+  },
+  {
+    "id": "60a07e9b7316cad2",
+    "model": "full_diffusion_original_seed42_dataset",
+    "prompt_id": 2,
+    "seed": 456
+  },
+  {
+    "id": "e52048c33f6a4867",
+    "model": "full_diffusion_original_seed42_dataset",
+    "prompt_id": 3,
+    "seed": 456
+  },
+  {
+    "id": "22dc69d1a45b87a1",
+    "model": "full_diffusion_original_seed42_dataset",
+    "prompt_id": 4,
+    "seed": 456
+  },
+  {
+    "id": "7680e86651293087",
+    "model": "full_diffusion_original_seed42_dataset",
+    "prompt_id": 5,
+    "seed": 456
+  },
+  {
+    "id": "ec625152cef00cb7",
+    "model": "full_diffusion_original_seed42_dataset",
+    "prompt_id": 6,
+    "seed": 456
+  },
+  {
+    "id": "9f131e70af9f4c02",
+    "model": "full_diffusion_original_seed42_dataset",
+    "prompt_id": 7,
+    "seed": 456
+  },
+  {
+    "id": "6ecfb4b34afa4922",
+    "model": "full_diffusion_original_seed42_dataset",
+    "prompt_id": 8,
+    "seed": 456
+  },
+  {
+    "id": "f3a6d8e74ef43ca6",
+    "model": "full_diffusion_original_seed42_dataset",
+    "prompt_id": 9,
+    "seed": 456
+  },
+  {
+    "id": "f484d3517855e92f",
+    "model": "full_diffusion_adjusted_seed42_dataset",
+    "prompt_id": 0,
+    "seed": 456
+  },
+  {
+    "id": "aca823ee182d7d3a",
+    "model": "full_diffusion_adjusted_seed42_dataset",
+    "prompt_id": 1,
+    "seed": 456
+  },
+  {
+    "id": "17dd29285067b141",
+    "model": "full_diffusion_adjusted_seed42_dataset",
+    "prompt_id": 2,
+    "seed": 456
+  },
+  {
+    "id": "5838228df379d7f9",
+    "model": "full_diffusion_adjusted_seed42_dataset",
+    "prompt_id": 3,
+    "seed": 456
+  },
+  {
+    "id": "b56d29009b4a68e1",
+    "model": "full_diffusion_adjusted_seed42_dataset",
+    "prompt_id": 4,
+    "seed": 456
+  },
+  {
+    "id": "3e9d1b36dccdeebf",
+    "model": "full_diffusion_adjusted_seed42_dataset",
+    "prompt_id": 5,
+    "seed": 456
+  },
+  {
+    "id": "87312f6dd10660a8",
+    "model": "full_diffusion_adjusted_seed42_dataset",
+    "prompt_id": 6,
+    "seed": 456
+  },
+  {
+    "id": "aa0c2231ac05a7fe",
+    "model": "full_diffusion_adjusted_seed42_dataset",
+    "prompt_id": 7,
+    "seed": 456
+  },
+  {
+    "id": "4e7d820ba3574676",
+    "model": "full_diffusion_adjusted_seed42_dataset",
+    "prompt_id": 8,
+    "seed": 456
+  },
+  {
+    "id": "540c41d0d6f69267",
+    "model": "full_diffusion_adjusted_seed42_dataset",
+    "prompt_id": 9,
+    "seed": 456
+  }
+]

@@ -118,6 +118,18 @@ El preset `extended` sigue limitado a una hora por variante y no garantiza una �
 
 ## Demo de generación en terminal
 
+Los checkpoints se distribuyen como adjuntos de la release `models-v1`, fuera de
+Git. Una vez publicada, descargar un modelo y su tokenizer con:
+
+```bash
+python scripts/download_models.py --models e-adjusted
+```
+
+Sin `--models` descarga los seis. La [guía de distribución](docs/model_release.md)
+explica preparación/publicación y verificación SHA-256. Las
+[comparaciones FP32 guardadas](reports/model_comparison/README.md) se incluyen
+como informes pequeños, sin pesos ni dataset.
+
 Generar con los checkpoints D/E existentes, sin entrenar ni descargar datos:
 
 ```bash

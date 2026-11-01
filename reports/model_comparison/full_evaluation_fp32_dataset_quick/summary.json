@@ -1,0 +1,45 @@
+[
+  {
+    "model": "full_baseline_seed42_dataset",
+    "checkpoint": "runs/full_baseline_seed42_dataset/best.pt",
+    "metrics": {
+      "loss_block_0": 1.8356327637705643,
+      "loss": 1.8356327637705643,
+      "perplexity": 6.2690997498537575
+    },
+    "generation_count": 10,
+    "tokens_per_second": 35.691927748870384,
+    "mean_repetition_4gram": 0.028888888888888898,
+    "empty_fraction": 0.0
+  },
+  {
+    "model": "full_diffusion_original_seed42_dataset",
+    "checkpoint": "runs/full_diffusion_original_seed42_dataset/best.pt",
+    "metrics": {
+      "loss_block_0": 0.5559756728628042,
+      "loss_block_1": 0.0,
+      "loss_block_2": 0.0,
+      "loss_sigma_max": 3.627242185078658,
+      "loss": 0.18532522428760143
+    },
+    "generation_count": 10,
+    "tokens_per_second": 3.559887465533566,
+    "mean_repetition_4gram": 0.0,
+    "empty_fraction": 0.0
+  },
+  {
+    "model": "full_diffusion_adjusted_seed42_dataset",
+    "checkpoint": "runs/full_diffusion_adjusted_seed42_dataset/best.pt",
+    "metrics": {
+      "loss_block_0": 2.7580708643746754,
+      "loss_block_1": 1.5389253180608433,
+      "loss_block_2": 0.36895395415637866,
+      "loss_sigma_max": 3.1770178089496204,
+      "loss": 1.555316712197299
+    },
+    "generation_count": 10,
+    "tokens_per_second": 3.5462607494480185,
+    "mean_repetition_4gram": 0.008888888888888901,
+    "empty_fraction": 0.0
+  }
+]
