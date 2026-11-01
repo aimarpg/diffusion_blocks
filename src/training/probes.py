@@ -153,9 +153,12 @@ def run_probe(cfg: dict) -> dict:
             if step >= tcfg['warmup_steps']:
                 timings.append(elapsed)
                 measured_tokens += n
-            row = {'step': step + 1, 'block': block, 'loss': float(loss.detach()), 'gradient_norm': float(gradient_norm) if torch.isfinite(gradient_norm) else None, 'seconds': elapsed, 'updated': updated}
+            row = {'step': step + 1, 'block': block, 'loss': float(loss.detach()), 'gradient_norm': float(gradient_norm) if torch.isfinite(gradient_norm) else None, 'clipped': bool(gradient_norm > tcfg['gradient_clip']), 'seconds': elapsed, 'updated': updated}
             history.append(row)
-            registrar(run, {f'train/{key}': value for key, value in row.items()}, step + 1)
+            # Cada bloque tiene su propia serie en W&B; mezclarlos en una sola línea da dientes de sierra.
+            per_block = f'train/block_{block}' if model.diffusion else 'train'
+            registrar(run, {f'{per_block}/{key}' if key in ('loss', 'gradient_norm', 'clipped') else f'train/{key}': value
+                            for key, value in row.items()}, step + 1)
             if (step + 1) % tcfg['log_every'] == 0:
                 print(f"paso {step + 1}/{tcfg['max_steps']} bloque={block} loss={row['loss']:.4f} s={elapsed:.3f}", flush=True)
         _sync(device)
